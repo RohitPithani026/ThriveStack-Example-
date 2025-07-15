@@ -1,7 +1,6 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { TrendingUp, DollarSign, Users, Package } from "lucide-react"
-import Link from "next/link"
 
 interface Product {
     id: string
@@ -13,12 +12,7 @@ interface Product {
 }
 
 export default function DashboardOverviewPage() {
-    const navLinks = [
-        { href: "#features", label: "Features" },
-        { href: "#pricing", label: "Pricing" },
-        { href: "#reviews", label: "Reviews" },
-    ]
-
+    
     // Mock data for products (can be fetched from an API in a real app)
     const products: Product[] = [
         {
@@ -88,18 +82,6 @@ export default function DashboardOverviewPage() {
                 <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
                 <p className="text-gray-600">Welcome back!</p> {/* User name will be handled by layout */}
             </div>
-
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-white transition-colors hover:text-indigo-300"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
