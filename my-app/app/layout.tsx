@@ -52,6 +52,10 @@ export default function RootLayout({
         page: window.location.pathname,
       });
 
+      mixpanel.track("Page View", {
+        page: window.location.pathname,
+      });
+
       window.addEventListener("popstate", handleRouteChange);
 
       return () => {
