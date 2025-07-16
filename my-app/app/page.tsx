@@ -1,10 +1,19 @@
+
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
+import amplitude from 'amplitude-js';
 
 export default function HomePage() {
+
+  const handleSignUp = () => {
+    amplitude.getInstance().logEvent('sign_up');
+    console.log('User Signed Up');
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -32,7 +41,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button variant="ghost">Sign In</Button>
+                <Button onClick={handleSignUp} variant="ghost">Sign In</Button>
               </Link>
               <Link href="/signup">
                 <Button>Get Started</Button>

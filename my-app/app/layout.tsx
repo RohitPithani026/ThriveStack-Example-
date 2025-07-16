@@ -9,6 +9,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
+import amplitude from 'amplitude-js';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -21,6 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    // Initialize Amplitude
+    amplitude.getInstance().init('4422bcec4debfc8b62f6b85ea73ae5a7');
+  }, []);
 
   useEffect(() => {
     // Only run this on the client side
