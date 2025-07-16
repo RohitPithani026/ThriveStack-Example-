@@ -3,8 +3,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
+import amplitude from 'amplitude-js';
 
 export default function HomePage() {
+
+  const handleStartFreeTrialClick = () => {
+    amplitude.getInstance().logEvent('click_start_free_trial');
+  };
+
+  const handleBuyNowClick = () => {
+    amplitude.getInstance().logEvent('click_buy_now');
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -58,11 +68,11 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <Button size="lg" className="text-lg px-8 py-3">
+              <Button id="start-free-trial" onClick={handleStartFreeTrialClick} size="lg" className="text-lg px-8 py-3">
                 Start Free Trial
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
+            <Button id="buy-now" onClick={handleBuyNowClick} size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
               Watch Demo
             </Button>
           </div>
