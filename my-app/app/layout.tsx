@@ -1,5 +1,3 @@
-// app/layout.tsx
-
 'use client';
 
 import { ReactNode, useEffect } from 'react';
@@ -8,7 +6,7 @@ import { Mona_Sans as FontSans } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
-import { initMixpanel } from '@/lib/mixpanel';
+import mixpanel from "mixpanel-browser";
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -23,7 +21,36 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    initMixpanel(); // Initialize Mixpanel
+    // Only run this on the client side
+    if (typeof window !== "undefined") {
+      mixpanel.init("96b5f76ad22e3b2fbdee6a0085e30c3e", {
+        debug: true,
+      });
+
+      // Track page views on initial load
+      mixpanel.track("Page Viewed", {
+        page: window.location.pathname,
+      });
+
+      // Track page views on route change (client-side routing)
+      const handleRouteChange = (event: PopStateEvent) => {
+        mixpanel.track("Page Viewed", {
+          page: window.location.pathname, // Use the current location after a route change
+        });
+      };
+
+      // Track initial page load
+      mixpanel.track("Page Viewed", {
+        page: window.location.pathname,
+      });
+
+      window.addEventListener("popstate", handleRouteChange);
+
+      return () => {
+        // Clean up the event listener on unmount
+        window.removeEventListener("popstate", handleRouteChange);
+      };
+    }
   }, []);
 
   useEffect(() => {
