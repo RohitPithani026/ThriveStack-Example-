@@ -16,7 +16,6 @@ interface User {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 

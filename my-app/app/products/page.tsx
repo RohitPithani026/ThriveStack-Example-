@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus } from "lucide-react"
+import { event } from "@/lib/gtag"
 
 interface Product {
   id: string
@@ -111,7 +112,14 @@ export default function ProductsPage() {
                 <h3 className="font-semibold mb-2">{product.name}</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-blue-600">${product.price}</span>
-                  <Button size="sm">Edit</Button>
+                  <Button onClick={() => {
+                    console.log("CTA clicked");
+                    event({
+                      action: 'first_action',
+                      category: 'Activation',
+                      label: 'Visited Product',
+                    });
+                  }} size="sm">Details</Button>
                 </div>
               </div>
             </CardContent>
