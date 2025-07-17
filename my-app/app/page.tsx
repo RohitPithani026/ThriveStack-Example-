@@ -42,7 +42,14 @@ export default function HomePage() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button onClick={handleSignUp} variant="ghost">Sign In</Button>
+                <Button onClick={() => {
+                  console.log("CTA clicked");
+                  event({
+                    action: 'cta_click',
+                    category: 'CTA',
+                    label: 'Sign up',
+                  });
+                }} variant="ghost">Sign In</Button>
               </Link>
               <Link href="/signup">
                 <Button>Get Started</Button>
