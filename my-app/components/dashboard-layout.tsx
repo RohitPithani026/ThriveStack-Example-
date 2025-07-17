@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LayoutDashboard, ShoppingBag, LogOut, Users } from "lucide-react"
+import { event } from "@/lib/gtag"
 
 interface User {
   email: string
@@ -29,12 +30,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [router])
 
   const handleLogout = () => {
+    event({
+      action: "logout_click",
+      category: "Navigation",
+      label: "Sidebar: Logout",
+    })
+
     localStorage.removeItem("user")
     router.push("/")
   }
 
+
   if (!user) {
-    return <div>Loading...</div> // Or a more sophisticated loading spinner
+    return <div>Loading...</div> 
   }
 
   const navItems = [
@@ -42,16 +50,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       name: "Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
+      label: "Sidebar: Dashboard",
     },
     {
       name: "Products",
       href: "/products",
       icon: ShoppingBag,
+      label: "Sidebar: Products",
     },
     {
       name: "Account",
       href: "/account",
-      icon: Users, 
+      icon: Users,
+      label: "Sidebar: Account",
     },
   ]
 
@@ -72,15 +83,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => (
             <Link key={item.name} href={item.href}>
               <button
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                  pathname === item.href ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"
-                }`}
+                onClick={() =>
+                  event({
+                    action: "sidebar_click",
+                    category: "Navigation",
+                    label: item.label,
+                  })
+                }
+                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${pathname === item.href ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.name}</span>
               </button>
             </Link>
           ))}
+
         </nav>
 
         <div className="p-4">
