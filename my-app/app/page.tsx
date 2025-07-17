@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
 import amplitude from 'amplitude-js';
+import { event } from '../lib/gtag';
 
 export default function HomePage() {
 
@@ -67,11 +68,23 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <Button size="lg" className="text-lg px-8 py-3">
+              <Button onClick={() => {
+                event({
+                  action: 'cta_click',
+                  category: 'CTA',
+                  label: 'Watch Demo',
+                });
+              }} size="lg" className="text-lg px-8 py-3">
                 Start Free Trial
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
+            <Button onClick={() => {
+              event({
+                action: 'cta_click',
+                category: 'CTA',
+                label: 'Start Free Trial',
+              });
+            }} size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
               Watch Demo
             </Button>
           </div>
