@@ -122,6 +122,15 @@ export default function ProductsPage() {
                       label: 'Visited Product',
                     });
                   }} size="sm">Details</Button>
+                  <Button onClick={() => {
+                    console.log("CTA clicked");
+                    event({
+                      action: "purchase_course",
+                      category: "Ecommerce",
+                      label: "Paid Course Purchased",
+                      value: 499, 
+                    });
+                  }} size="sm">Buy Now</Button>
                 </div>
               </div>
             </CardContent>
