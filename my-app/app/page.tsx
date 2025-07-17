@@ -69,6 +69,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
               <Button onClick={() => {
+                console.log("CTA clicked");
                 event({
                   action: 'cta_click',
                   category: 'CTA',
@@ -79,6 +80,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Button onClick={() => {
+              console.log("CTA clicked");
               event({
                 action: 'cta_click',
                 category: 'CTA',
