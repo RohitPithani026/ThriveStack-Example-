@@ -99,9 +99,9 @@ export default function LoginPage() {
               <Button onClick={() => {
                 console.log("CTA clicked");
                 event({
-                  action: 'cta_click',
-                  category: 'CTA',
-                  label: 'Sign up',
+                  action: 'dashboard_visit',
+                  category: 'User',
+                  label: 'Initial Dashboard Load',
                 });
               }} type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}

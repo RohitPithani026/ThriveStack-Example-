@@ -134,9 +134,9 @@ export default function SignupPage() {
               <Button onClick={() => {
                 console.log("CTA clicked");
                 event({
-                  action: 'cta_click',
-                  category: 'CTA',
-                  label: 'Sign up',
+                  action: 'sign_up',
+                  category: 'User',
+                  label: 'Completed Registration',
                 });
               }} type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Create account"}

@@ -39,9 +39,9 @@ export default function HomePage() {
                 <Button onClick={() => {
                   console.log("CTA clicked");
                   event({
-                    action: 'cta_click',
-                    category: 'CTA',
-                    label: 'Sign up',
+                    action: 'sign_up',
+                    category: 'User',
+                    label: 'Email Sign Up',
                   });
                 }} variant="ghost">Sign In</Button>
               </Link>
