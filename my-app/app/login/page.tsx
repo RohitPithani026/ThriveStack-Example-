@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { event } from '@/lib/gtag';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -95,7 +96,14 @@ export default function LoginPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button onClick={() => {
+                console.log("CTA clicked");
+                event({
+                  action: 'cta_click',
+                  category: 'CTA',
+                  label: 'Sign up',
+                });
+              }} type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
