@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -9,8 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { event } from '@/lib/gtag'
-import { useThriveStack } from "@/components/ThriveStackProvider"
+import { event } from '@/lib/gtag';
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -19,23 +19,14 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [thriveInitialized, setThriveInitialized] = useState(false)
   const router = useRouter()
-  const { isReady, setUser, group } = useThriveStack()
-
-  // Additional check for ThriveStack initialization
-  useEffect(() => {
-    if (isReady) {
-      setThriveInitialized(true)
-    }
-  }, [isReady])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    // Form validation
+    // Validation
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all fields")
       setIsLoading(false)
@@ -54,112 +45,14 @@ export default function SignupPage() {
       return
     }
 
+    // Simulate account creation
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Save user data
-      const user = { email, name }
-      localStorage.setItem("user", JSON.stringify(user))
-      
-      // Prepare tracking data
-      const timestamp = new Date().toISOString()
-      const userId = email
-      const accountId = `account_${email}`
-
-      // Debug ThriveStack availability
-      console.log("[DEBUG] ThriveStack status:", {
-        isReady,
-        thriveInitialized,
-        windowExists: typeof window !== 'undefined',
-        thrivestackExists: typeof window.thrivestack !== 'undefined'
-      })
-
-      // Track events if ThriveStack is available
-      if (thriveInitialized && typeof window !== 'undefined' && window.thrivestack) {
-        try {
-          // 1. Set user data
-          console.log("[DEBUG] Setting user data...")
-          await setUser(userId, email, {
-            user_name: name,
-            signup_date: timestamp,
-          })
-
-          // 2. Create group/account
-          console.log("[DEBUG] Setting group data...")
-          await group({
-            user_id: userId,
-            group_id: accountId,
-            group_name: `${name}'s Account`,
-            properties: {
-              plan_name: "Starter Plan",
-              employee_count: 1,
-            }
-          })
-
-          // 3. Track signup event
-          console.log("[DEBUG] Tracking signup event...")
-          window.thrivestack.track([{
-            event_name: "signed_up",
-            properties: {
-              user_email: email,
-              user_name: name,
-              utm_campaign: "customer_success",
-              utm_medium: "referral",
-              utm_source: "twitter",
-              utm_term: "free_trial"
-            },
-            user_id: userId,
-            timestamp: timestamp
-          }])
-
-          // 4. Track account creation
-          console.log("[DEBUG] Tracking account creation...")
-          window.thrivestack.track([{
-            event_name: "account_created",
-            properties: {
-              account_domain: window.location.hostname,
-              account_id: accountId,
-              account_name: `${name}'s Account`
-            },
-            user_id: userId,
-            timestamp: timestamp,
-            context: {
-              group_id: accountId
-            }
-          }])
-
-          // 5. Track user-company association
-          console.log("[DEBUG] Tracking user-company association...")
-          window.thrivestack.track([{
-            event_name: "account_added_user",
-            properties: {
-              account_name: `${name}'s Account`,
-              user_email: email
-            },
-            user_id: userId,
-            timestamp: timestamp,
-            context: {
-              group_id: accountId
-            }
-          }])
-
-          console.log("[DEBUG] All ThriveStack operations completed successfully")
-
-        } catch (e) {
-          console.error("[ERROR] ThriveStack tracking failed:", e)
-          // Continue with form submission even if tracking fails
-        }
-      } else {
-        console.warn("[WARNING] ThriveStack not initialized - skipping analytics")
-      }
-
-      // Redirect to dashboard
+      localStorage.setItem("user", JSON.stringify({ email, name }))
       router.push("/dashboard")
-
     } catch (err) {
       setError("Failed to create account")
-      console.error("Signup error:", err)
     } finally {
       setIsLoading(false)
     }
@@ -238,18 +131,14 @@ export default function SignupPage() {
                 />
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-                onClick={() => {
-                  event({
-                    action: 'signup_submit',
-                    category: 'User',
-                    label: 'Signup Form Submission',
-                  })
-                }}
-              >
+              <Button onClick={() => {
+                console.log("CTA clicked");
+                event({
+                  action: 'dashboard_visit',
+                  category: 'User',
+                  label: 'Initial Dashboard Load',
+                });
+              }} type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Create account"}
               </Button>
             </form>
