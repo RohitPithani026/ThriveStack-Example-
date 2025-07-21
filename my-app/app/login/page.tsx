@@ -35,22 +35,24 @@ export default function LoginPage() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const user = { email, name: email.split("@")[0] };
+      const name = email.split("@")[0];
+      const user = { email, name };
+
       localStorage.setItem("user", JSON.stringify(user));
 
+      // ✅ Track Login in ThriveStack
       if (isReady) {
-        const userId = email;
-        await setUser(userId, email, {
-          user_name: user.name,
-          plan_type: 'free',
+        await setUser(email, email, {
+          user_name: name,
+          login_time: new Date().toISOString(),
         });
 
         await group({
-          user_id: userId,
-          group_id: 'org_123',
-          group_name: 'Demo Org',
+          user_id: email,
+          group_id: "account_" + email,
+          group_name: name + "'s Account",
           properties: {
-            plan_name: 'Starter',
+            plan_name: "Starter Plan",
             employee_count: 1,
           },
         });
@@ -63,7 +65,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

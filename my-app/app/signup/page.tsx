@@ -24,61 +24,74 @@ export default function SignupPage() {
   const { isReady, setUser, group } = useThriveStack();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    // Validation
     if (!name || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields")
-      setIsLoading(false)
-      return
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters")
-      setIsLoading(false)
-      return
+      setError("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate account creation
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const user = { email, name: email.split("@")[0] };
+      const user = { email, name };
       localStorage.setItem("user", JSON.stringify(user));
 
-      if (isReady) {
-        const userId = email;
-        await setUser(userId, email, {
-          user_name: user.name,
-          plan_type: 'free',
+      // ✅ ThriveStack tracking
+      if (isReady && typeof window !== "undefined") {
+        await setUser(email, email, {
+          user_name: name,
+          signup_date: new Date().toISOString(),
         });
 
         await group({
-          user_id: userId,
-          group_id: 'org_123',
-          group_name: 'Demo Org',
+          user_id: email,
+          group_id: "account_" + email,
+          group_name: name + "'s Account",
           properties: {
-            plan_name: 'Starter',
+            plan_name: "Starter Plan",
             employee_count: 1,
           },
         });
+
+        window.thrivestack.track([
+          {
+            event_name: "signed_up",
+            properties: {
+              user_email: email,
+              user_name: name,
+              signup_date: new Date().toISOString(),
+              utm_source: "website",
+              utm_campaign: "signup",
+            },
+            user_id: email,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       }
 
       router.push("/dashboard");
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Failed to create account");
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

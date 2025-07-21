@@ -130,18 +130,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <script
-          src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
-          data-api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
-          data-source="product"
-          async
-        ></script>
-        <script
-          src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
-          data-api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
-          data-source="marketing"
-          async
-        ></script>
+        
       </head>
       <ThriveStackProvider
         apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
