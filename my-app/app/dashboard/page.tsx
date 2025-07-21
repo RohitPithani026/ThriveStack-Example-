@@ -15,39 +15,6 @@ interface Product {
 }
 
 export default function DashboardOverviewPage() {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return;
-
-    const user = JSON.parse(userStr);
-
-    const waitForThriveStack = () => {
-      if (window.thrivestack) {
-        // Set User
-        window.thrivestack.setUser(user.email, user.email, {
-          user_name: user.name,
-          plan_type: "free",
-        });
-
-        // Set Group (if available)
-        if (user.orgId && user.orgName) {
-          window.thrivestack.setGroup(user.orgId, user.email, user.orgName, {
-            plan_name: "Starter",
-            employee_count: 1,
-          });
-        }
-      } else {
-        // Try again after a short delay
-        setTimeout(waitForThriveStack, 100);
-      }
-    };
-
-    waitForThriveStack();
-  }, []);
-
-
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
     {

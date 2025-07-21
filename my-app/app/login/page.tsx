@@ -32,60 +32,16 @@ export default function LoginPage() {
     }
 
     // Simulate authentication (replace with real auth)
-    // try {
-    //   await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    //   // For demo purposes, accept any email/password
-    //   localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
-    //   router.push("/dashboard")
-    // } catch (err) {
-    //   setError("Invalid credentials")
-    // } finally {
-    //   setIsLoading(false)
-    // }
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      const user = {
-        email,
-        name: email.split("@")[0],
-        orgId: "org-001", // from your backend/user object
-        orgDomain: "acme.com",
-        orgName: "Acme Corporation"
-      };
-
-      localStorage.setItem("user", JSON.stringify(user));
-
-      if (typeof window !== "undefined" && window.thrivestack) {
-        window.thrivestack.setUser(email, email, {
-          user_name: name,
-          plan_type: "free"
-        });
-
-        // Optional: If user belongs to an org/account
-        window.thrivestack.setGroup(email, "org_123", "My Company", {
-          plan_name: "Starter",
-          employee_count: 5
-        });
-
-        // Send "signed_up" event
-        window.thrivestack.track([{
-          event_name: "signed_up",
-          user_id: email,
-          timestamp: new Date().toISOString(),
-          properties: {
-            user_email: email,
-            user_name: name,
-            utm_campaign: "organic",
-            utm_source: "website"
-          }
-        }]);
-      }
-      
-      router.push("/dashboard");
+      // For demo purposes, accept any email/password
+      localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
+      router.push("/dashboard")
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Invalid credentials")
+    } finally {
+      setIsLoading(false)
     }
   }
 

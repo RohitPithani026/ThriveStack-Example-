@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
-import { waitForThriveStack } from '@/lib/thrivestack';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -23,29 +22,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return;
-
-    const user = JSON.parse(userStr);
-
-    waitForThriveStack(() => {
-      window.thrivestack.setUser(user.email, user.email, {
-        user_name: user.name,
-        plan_type: "free",
-      });
-
-      if (user.orgId && user.orgName) {
-        window.thrivestack.setGroup(user.orgId, user.email, user.orgName, {
-          plan_name: "Starter",
-          employee_count: 1,
-        });
-      }
-    });
-  }, []);
-
-
 
   useEffect(() => {
     // Initialize Amplitude
