@@ -17,19 +17,21 @@ interface Product {
 export default function DashboardOverviewPage() {
   useEffect(() => {
     if (typeof window !== "undefined" && window.thrivestack) {
-      window.thrivestack.track([{
-        "event_name": "signed_up",
-        "properties": {
-            "user_email": "john.doe@acme.xyz",
-            "user_name": "John Doe",
-            "utm_campaign": "customer_success",
-            "utm_medium": "referral",
-            "utm_source": "twitter",
-            "utm_term": "free_trial"
+      window.thrivestack.track([
+        {
+          event_name: "signed_up",
+          properties: {
+            user_email: "john.doe@acme.xyz",
+            user_name: "John Doe",
+            utm_campaign: "customer_success",
+            utm_medium: "referral",
+            utm_source: "twitter",
+            utm_term: "free_trial",
+          },
+          user_id: "18f716ac-37a4-464f-adb7-3cc30032308c",
+          timestamp: new Date().toISOString(),
         },
-        "user_id": "18f716ac-37a4-464f-adb7-3cc30032308c",
-        "timestamp": "2025-07-21T09:07:36.160Z"
-    }]);
+      ]);
     }
   }, []);
 
