@@ -4,6 +4,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserAuth } from "@/components/UserAuth"
 import { TrendingUp, DollarSign, Users, Package } from "lucide-react"
+import { useState } from "react";
 
 interface Product {
   id: string
@@ -15,6 +16,12 @@ interface Product {
 }
 
 export default function DashboardOverviewPage() {
+  const [user] = useState({
+    userId: '12345',
+    email: 'john.doe@example.com',
+    name: 'John Doe'
+  });
+
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
     {
@@ -84,7 +91,7 @@ export default function DashboardOverviewPage() {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600">Welcome back!</p> {/* User name will be handled by layout */}
       </div>
-      <UserAuth />
+      <UserAuth user={user} />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
