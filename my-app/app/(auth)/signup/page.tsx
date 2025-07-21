@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -19,8 +19,16 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [thriveInitialized, setThriveInitialized] = useState(false)
   const router = useRouter()
   const { isReady, setUser, group } = useThriveStack()
+
+  // Additional check for ThriveStack initialization
+  useEffect(() => {
+    if (isReady) {
+      setThriveInitialized(true)
+    }
+  }, [isReady])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,12 +70,13 @@ export default function SignupPage() {
       // Debug ThriveStack availability
       console.log("[DEBUG] ThriveStack status:", {
         isReady,
+        thriveInitialized,
         windowExists: typeof window !== 'undefined',
         thrivestackExists: typeof window.thrivestack !== 'undefined'
       })
 
       // Track events if ThriveStack is available
-      if (isReady) {
+      if (thriveInitialized && typeof window !== 'undefined' && window.thrivestack) {
         try {
           // 1. Set user data
           console.log("[DEBUG] Setting user data...")
@@ -88,55 +97,52 @@ export default function SignupPage() {
             }
           })
 
-          // Note: Since track method isn't in your context, we'll use window directly
-          if (typeof window !== 'undefined' && window.thrivestack?.track) {
-            // 3. Track signup event
-            console.log("[DEBUG] Tracking signup event...")
-            window.thrivestack.track([{
-              event_name: "signed_up",
-              properties: {
-                user_email: email,
-                user_name: name,
-                utm_campaign: "customer_success",
-                utm_medium: "referral",
-                utm_source: "twitter",
-                utm_term: "free_trial"
-              },
-              user_id: userId,
-              timestamp: timestamp
-            }])
+          // 3. Track signup event
+          console.log("[DEBUG] Tracking signup event...")
+          window.thrivestack.track([{
+            event_name: "signed_up",
+            properties: {
+              user_email: email,
+              user_name: name,
+              utm_campaign: "customer_success",
+              utm_medium: "referral",
+              utm_source: "twitter",
+              utm_term: "free_trial"
+            },
+            user_id: userId,
+            timestamp: timestamp
+          }])
 
-            // 4. Track account creation
-            console.log("[DEBUG] Tracking account creation...")
-            window.thrivestack.track([{
-              event_name: "account_created",
-              properties: {
-                account_domain: window.location.hostname,
-                account_id: accountId,
-                account_name: `${name}'s Account`
-              },
-              user_id: userId,
-              timestamp: timestamp,
-              context: {
-                group_id: accountId
-              }
-            }])
+          // 4. Track account creation
+          console.log("[DEBUG] Tracking account creation...")
+          window.thrivestack.track([{
+            event_name: "account_created",
+            properties: {
+              account_domain: window.location.hostname,
+              account_id: accountId,
+              account_name: `${name}'s Account`
+            },
+            user_id: userId,
+            timestamp: timestamp,
+            context: {
+              group_id: accountId
+            }
+          }])
 
-            // 5. Track user-company association
-            console.log("[DEBUG] Tracking user-company association...")
-            window.thrivestack.track([{
-              event_name: "account_added_user",
-              properties: {
-                account_name: `${name}'s Account`,
-                user_email: email
-              },
-              user_id: userId,
-              timestamp: timestamp,
-              context: {
-                group_id: accountId
-              }
-            }])
-          }
+          // 5. Track user-company association
+          console.log("[DEBUG] Tracking user-company association...")
+          window.thrivestack.track([{
+            event_name: "account_added_user",
+            properties: {
+              account_name: `${name}'s Account`,
+              user_email: email
+            },
+            user_id: userId,
+            timestamp: timestamp,
+            context: {
+              group_id: accountId
+            }
+          }])
 
           console.log("[DEBUG] All ThriveStack operations completed successfully")
 
@@ -145,7 +151,7 @@ export default function SignupPage() {
           // Continue with form submission even if tracking fails
         }
       } else {
-        console.warn("[WARNING] ThriveStack not ready - skipping analytics")
+        console.warn("[WARNING] ThriveStack not initialized - skipping analytics")
       }
 
       // Redirect to dashboard
