@@ -120,6 +120,10 @@ export default function RootLayout({
           api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
           data-source="marketing">
         </script>
+        <script src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
+          api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
+          data-source="product">
+        </script>
       </head>
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
