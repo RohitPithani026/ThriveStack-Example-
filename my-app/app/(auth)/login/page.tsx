@@ -42,8 +42,8 @@ export default function LoginPage() {
 
       // ✅ Track Login in ThriveStack
       if (isReady) {
-        await setUser(email, email, {
-          user_name: user.name,
+        await setUser("abc@123", "abc@123", {
+          user_name: "user.name",
           login_time: new Date().toISOString(),
         });
 
