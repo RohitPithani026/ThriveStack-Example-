@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
+import { ThriveStackProvider } from '../components/ThriveStackProvider';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -24,47 +25,15 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem("user");
-      if (!userStr) return;
+    const userStr = localStorage.getItem("user");
+    if (!userStr || typeof window === 'undefined' || !window.thrivestack) return;
 
-      const user = JSON.parse(userStr);
+    const user = JSON.parse(userStr);
 
-      const thriveScript = document.createElement('script');
-      thriveScript.src = 'https://ts-script.app.thrivestack.ai/latest/thrivestack.js';
-      thriveScript.async = true;
-      thriveScript.setAttribute('data-api-key', '/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A=');
-      thriveScript.setAttribute('data-source', 'product');
+    window.thrivestack.setUser("{User_Id}", "{User_Email}");
 
-      thriveScript.onload = () => {
-        // Wait for `window.thrivestack` to become available
-        const interval = setInterval(() => {
-          if (window.thrivestack) {
-            clearInterval(interval);
-
-            window.thrivestack.setUser(user.id, user.email, {
-              user_name: user.name,
-              plan_type: user.plan || 'free',
-            });
-
-            if (user.orgId && user.orgName) {
-              window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
-                plan_name: 'Starter',
-                employee_count: 1,
-              });
-            }
-          }
-        }, 50);
-
-        // Timeout fallback
-        setTimeout(() => clearInterval(interval), 5000);
-      };
-
-      thriveScript.onerror = () => {
-        console.error('Failed to load ThriveStack script');
-      };
-
-      document.head.appendChild(thriveScript);
+    if (user.orgId && user.orgName) {
+      window.thrivestack.setGroup("{Group_Id}", "{Group_Domain}", "{Group_Name}");
     }
   }, []);
 
@@ -174,6 +143,12 @@ export default function RootLayout({
           async
         ></script>
       </head>
+      <ThriveStackProvider
+        apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
+        source="product"
+      >
+        {children}
+      </ThriveStackProvider>
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
       >

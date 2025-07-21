@@ -1,45 +1,77 @@
-export function loadThriveScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const existingScript = document.querySelector('script[src*="thrivestack.js"]');
-    if (existingScript) {
-      resolve();
-      return;
+export interface ThriveStackWindow extends Window {
+    thriveStack?: {
+        setUser: (userId: string, emailId: string, properties?: Record<string, any>) => Promise<any>;
+        init: (userId?: string, source?: string) => Promise<void>;
+        identify: (data: any) => Promise<any>;
+        group: (data: any) => Promise<any>;
+        [key: string]: any;
+    };
+}
+
+declare const window: ThriveStackWindow;
+
+// Simple initialization function
+export const initThriveStack = (apiKey: string, source: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.thriveStack) {
+            resolve();
+            return;
+        }
+
+        // Create script element
+        const script = document.createElement('script');
+        script.src = 'https://ts-script.app.thrivestack.ai/latest/thrivestack.js';
+        script.setAttribute('data-api-key', apiKey);
+        script.setAttribute('data-source', source);
+        script.setAttribute('data-track-clicks', 'true');
+        script.setAttribute('data-track-forms', 'false');
+        script.async = true;
+
+        script.onload = () => {
+            // Wait a bit for auto-initialization
+            setTimeout(() => {
+                if (window.thriveStack) {
+                    resolve();
+                } else {
+                    reject(new Error('ThriveStack failed to initialize'));
+                }
+            }, 100);
+        };
+
+        script.onerror = () => {
+            reject(new Error('Failed to load ThriveStack script'));
+        };
+
+        document.head.appendChild(script);
+    });
+};
+
+// Wrapper functions for easy use
+export const thriveStackSetUser = async (
+    userId: string,
+    email: string,
+    properties: Record<string, any> = {}
+): Promise<any> => {
+    if (!window.thriveStack) {
+        throw new Error('ThriveStack not initialized');
     }
 
-    // 🛠️ Inject config BEFORE loading script
-    window.__THRIVE_API_KEY__ = '/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A=';
-    window.__THRIVE_SOURCE__ = 'product';
+    return window.thriveStack.setUser(userId, email, properties);
+};
 
-    const script = document.createElement('script');
-    script.src = '/libs/thrivestack.js'; // served locally
-    script.async = true;
+export const thriveStackIdentify = async (data: any): Promise<any> => {
+    if (!window.thriveStack) {
+        throw new Error('ThriveStack not initialized');
+    }
 
-    script.onload = () => {
-      // Wait for window.ThriveStack to be defined
-      const interval = setInterval(() => {
-        if (window.ThriveStack) {
-          clearInterval(interval);
+    return window.thriveStack.identify(data);
+};
 
-          // 🧠 Manual init using constructor from global
-          const instance = new window.ThriveStack({
-            apiKey: window.__THRIVE_API_KEY__,
-            source: window.__THRIVE_SOURCE__,
-            trackClicks: true,
-          });
+export const thriveStackGroup = async (data: any): Promise<any> => {
+    if (!window.thriveStack) {
+        throw new Error('ThriveStack not initialized');
+    }
 
-          window.thrivestack = instance;
-          resolve();
-        }
-      }, 50);
-
-      setTimeout(() => {
-        clearInterval(interval);
-        reject(new Error('ThriveStack global constructor not found'));
-      }, 3000);
-    };
-
-    script.onerror = () => reject(new Error('Failed to load ThriveStack.js from /libs'));
-
-    document.head.appendChild(script);
-  });
-}
+    return window.thriveStack.group(data);
+};
