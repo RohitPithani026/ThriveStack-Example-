@@ -40,18 +40,18 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
 
       // Track sign-in event with ThriveStack
-      thriveStackTrack([
-        {
-          event_name: "signed_up",
-          user_id: email, // or use your app's userId
-          timestamp: new Date().toISOString(),
-          properties: {
-            user_email: email,
-            user_name: email.split("@")[0],
-            utm_source: "login_form", // or dynamic source
-          }
-        }
-      ]);
+      // thriveStackTrack([
+      //   {
+      //     event_name: "signed_up",
+      //     user_id: email, // or use your app's userId
+      //     timestamp: new Date().toISOString(),
+      //     properties: {
+      //       user_email: email,
+      //       user_name: email.split("@")[0],
+      //       utm_source: "login_form", // or dynamic source
+      //     }
+      //   }
+      // ]);
       router.push("/dashboard")
     } catch (err) {
       setError("Invalid credentials")

@@ -3,8 +3,9 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserAuth } from "@/components/UserAuth"
+import { thriveStackTrack } from "@/lib/thrivestack";
 import { TrendingUp, DollarSign, Users, Package } from "lucide-react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Product {
   id: string
@@ -15,7 +16,42 @@ interface Product {
   sales: number
 }
 
+interface StoredUser {
+  userId: string;
+  email: string;
+  name: string;
+}
+
 export default function DashboardOverviewPage() {
+    const [user, setUserState] = useState<StoredUser | null>(null);
+  
+    useEffect(() => {
+      const saved = localStorage.getItem("user");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setUserState({
+          userId: parsed.userId || parsed.email,
+          email: parsed.email,
+          name: parsed.name,
+        });
+          // Track sign-in event with ThriveStack
+      thriveStackTrack([
+        {
+          event_name: "signed_up",
+          user_id: parsed.userId || parsed.email, // or use your app's userId
+          timestamp: new Date().toISOString(),
+          properties: {
+            user_email: parsed.email,
+            user_name: parsed.name,
+            utm_source: "login_form", // or dynamic source
+          }
+        }
+      ]);
+      }
+      
+    }, []);
+
+      
 
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
