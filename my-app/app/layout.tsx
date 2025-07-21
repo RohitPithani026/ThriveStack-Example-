@@ -118,16 +118,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <ThriveStackProvider
-        apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
-        source="marketing,product"
-      >
-        {children}
-      </ThriveStackProvider>
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
       >
-        {children}
+        <ThriveStackProvider
+          apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
+          source="marketing,product"
+        >
+          {children}
+        </ThriveStackProvider>
       </body>
     </html>
   );
