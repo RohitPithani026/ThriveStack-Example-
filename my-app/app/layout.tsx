@@ -119,8 +119,8 @@ export default function RootLayout({
         />
       </head>
       <ThriveStackProvider
-        apiKey={process.env.NEXT_PUBLIC_THRIVESTACK_API_KEY!}
-        source={process.env.NEXT_PUBLIC_THRIVESTACK_SOURCE!}
+        apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
+        source="marketing,product"
       >
         {children}
       </ThriveStackProvider>
