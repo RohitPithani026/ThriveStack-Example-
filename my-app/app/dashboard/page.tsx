@@ -17,13 +17,6 @@ interface Product {
 
 export default function DashboardOverviewPage() {
 
-
-  const [user] = useState({
-    userId: '12345',
-    email: 'john.doe@example.com',
-    name: 'John Doe'
-  });
-
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
     {

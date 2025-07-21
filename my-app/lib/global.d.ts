@@ -7,9 +7,17 @@ declare global {
     sessionReplay: any;
     thriveStack?: {
       setUser: (userId: string, emailId: string, properties?: Record<string, any>) => Promise<any>;
-      init: (userId?: string, source?: string) => Promise<void>;
+      setGroup?: (userId: string, accountId: string, accountName: string, properties?: Record<string, any>) => Promise<any>;
+      group?: (userId: string, accountId: string, accountName: string, properties?: Record<string, any>) => Promise<any>;
       identify: (data: any) => Promise<any>;
-      group: (data: any) => Promise<any>;
+      init: (userId?: string, source?: string) => Promise<void>;
+      track?: (events: {
+        event_name: string;
+        user_id: string;
+        timestamp?: string;
+        properties?: Record<string, any>;
+      }[]) => void;
+      [key: string]: any;
     };
   }
 }

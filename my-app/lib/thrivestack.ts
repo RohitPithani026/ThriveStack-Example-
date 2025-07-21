@@ -1,25 +1,18 @@
-export interface ThriveStackWindow extends Window {
-  thriveStack?: {
-    setUser: (userId: string, emailId: string, properties?: Record<string, any>) => Promise<any>;
-    init: (userId?: string, source?: string) => Promise<void>;
-    identify: (data: any) => Promise<any>;
-    group: (data: any) => Promise<any>;
-    [key: string]: any;
-  };
+export interface ThriveStackEvent {
+  event_name: string;
+  user_id: string;
+  timestamp?: string;
+  properties?: Record<string, any>;
 }
- 
-declare const window: ThriveStackWindow;
- 
-// Simple initialization function
+
+// Initialize the script
 export const initThriveStack = (apiKey: string, source: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    // Check if already loaded
     if (window.thriveStack) {
       resolve();
       return;
     }
- 
-    // Create script element
+
     const script = document.createElement('script');
     script.src = 'https://ts-script.app.thrivestack.ai/latest/thrivestack.js';
     script.setAttribute('data-api-key', apiKey);
@@ -27,9 +20,8 @@ export const initThriveStack = (apiKey: string, source: string): Promise<void> =
     script.setAttribute('data-track-clicks', 'true');
     script.setAttribute('data-track-forms', 'false');
     script.async = true;
- 
+
     script.onload = () => {
-      // Wait a bit for auto-initialization
       setTimeout(() => {
         if (window.thriveStack) {
           resolve();
@@ -38,42 +30,36 @@ export const initThriveStack = (apiKey: string, source: string): Promise<void> =
         }
       }, 100);
     };
- 
-    script.onerror = () => {
-      reject(new Error('Failed to load ThriveStack script'));
-    };
- 
+
+    script.onerror = () => reject(new Error('Failed to load ThriveStack script'));
+
     document.head.appendChild(script);
   });
 };
- 
-// Wrapper functions for easy use
+
+// Wrapper utility functions
 export const thriveStackSetUser = async (
-  userId: string, 
-  email: string, 
+  userId: string,
+  email: string,
   properties: Record<string, any> = {}
 ): Promise<any> => {
-  if (!window.thriveStack) {
-    throw new Error('ThriveStack not initialized');
-  }
- 
+  if (!window.thriveStack?.setUser) throw new Error('ThriveStack not initialized');
   return window.thriveStack.setUser(userId, email, properties);
 };
- 
+
 export const thriveStackIdentify = async (data: any): Promise<any> => {
-  if (!window.thriveStack) {
-    throw new Error('ThriveStack not initialized');
-  }
- 
+  if (!window.thriveStack?.identify) throw new Error('ThriveStack not initialized');
   return window.thriveStack.identify(data);
 };
- 
-export const thriveStackGroup = async (data: any): Promise<any> => {
-  if (!window.thriveStack) {
-    throw new Error('ThriveStack not initialized');
-  }
- 
-  return window.thriveStack.group(data);
+
+export const thriveStackGroup = async (
+  userId: string,
+  accountId: string,
+  accountName: string,
+  properties: Record<string, any> = {}
+): Promise<any> => {
+  if (!window.thriveStack?.group) throw new Error('ThriveStack group() not available');
+  return window.thriveStack.group(userId, accountId, accountName, properties);
 };
 
 export const thriveStackSetGroup = async (
@@ -82,9 +68,11 @@ export const thriveStackSetGroup = async (
   accountName: string,
   properties: Record<string, any> = {}
 ): Promise<any> => {
-  if (!window.thriveStack) {
-    throw new Error('ThriveStack not initialized');
-  }
-
+  if (!window.thriveStack?.setGroup) throw new Error('ThriveStack setGroup() not available');
   return window.thriveStack.setGroup(userId, accountId, accountName, properties);
+};
+
+export const thriveStackTrack = (events: ThriveStackEvent[]): void => {
+  if (!window.thriveStack?.track) throw new Error('ThriveStack track() not available');
+  window.thriveStack.track(events);
 };
