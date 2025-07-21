@@ -25,19 +25,6 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr || typeof window === 'undefined' || !window.thrivestack) return;
-
-    const user = JSON.parse(userStr);
-
-    window.thrivestack.setUser("{User_Id}", "{User_Email}");
-
-    if (user.orgId && user.orgName) {
-      window.thrivestack.setGroup("{Group_Id}", "{Group_Domain}", "{Group_Name}");
-    }
-  }, []);
-
-  useEffect(() => {
     // Initialize Amplitude
     amplitude.getInstance().init('4422bcec4debfc8b62f6b85ea73ae5a7');
   }, []);
