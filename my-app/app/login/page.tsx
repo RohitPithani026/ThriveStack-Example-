@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
+import { useThriveStack } from "@/components/ThriveStackProvider"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -18,32 +19,51 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { isReady, setUser, group } = useThriveStack();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    // Simple validation
     if (!email || !password) {
-      setError("Please fill in all fields")
-      setIsLoading(false)
-      return
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate authentication (replace with real auth)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // For demo purposes, accept any email/password
-      localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
-      router.push("/dashboard")
+      const user = { email, name: email.split("@")[0] };
+      localStorage.setItem("user", JSON.stringify(user));
+
+      if (isReady) {
+        const userId = email;
+        await setUser(userId, email, {
+          user_name: user.name,
+          plan_type: 'free',
+        });
+
+        await group({
+          user_id: userId,
+          group_id: 'org_123',
+          group_name: 'Demo Org',
+          properties: {
+            plan_name: 'Starter',
+            employee_count: 1,
+          },
+        });
+      }
+
+      router.push("/dashboard");
     } catch (err) {
-      setError("Invalid credentials")
+      setError("Invalid credentials");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

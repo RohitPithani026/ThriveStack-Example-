@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
+import { useThriveStack } from "@/components/ThriveStackProvider"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -20,6 +21,7 @@ export default function SignupPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { isReady, setUser, group } = useThriveStack();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,14 +49,34 @@ export default function SignupPage() {
 
     // Simulate account creation
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      localStorage.setItem("user", JSON.stringify({ email, name }))
-      router.push("/dashboard")
+      const user = { email, name: email.split("@")[0] };
+      localStorage.setItem("user", JSON.stringify(user));
+
+      if (isReady) {
+        const userId = email;
+        await setUser(userId, email, {
+          user_name: user.name,
+          plan_type: 'free',
+        });
+
+        await group({
+          user_id: userId,
+          group_id: 'org_123',
+          group_name: 'Demo Org',
+          properties: {
+            plan_name: 'Starter',
+            employee_count: 1,
+          },
+        });
+      }
+
+      router.push("/dashboard");
     } catch (err) {
-      setError("Failed to create account")
+      setError("Invalid credentials");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
