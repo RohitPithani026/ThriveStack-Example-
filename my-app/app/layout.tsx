@@ -24,31 +24,29 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
+  useEffect(() => {
+    const identifyUser = async () => {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return;
 
-useEffect(() => {
-  const identifyUser = async () => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return;
+      const user = JSON.parse(userStr);
+      await waitForThriveStack();
 
-    const user = JSON.parse(userStr);
+      window.thrivestack('identify', {
+        userId: user.email,
+        email: user.email,
+        name: user.name,
+      });
 
-    await waitForThriveStack();
+      if (user.orgId && user.orgDomain && user.orgName) {
+        window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
+      }
 
-    window.thrivestack('identify', {
-      userId: user.email,
-      email: user.email,
-      name: user.name,
-    });
+      console.log("✅ ThriveStack user + group identified:", user);
+    };
 
-    if (user.orgId && user.orgDomain && user.orgName) {
-      window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
-    }
-
-    console.log("✅ ThriveStack user + group identified:", user);
-  };
-
-  identifyUser();
-}, []);
+    identifyUser();
+  }, []);
 
   useEffect(() => {
     // Initialize Amplitude
