@@ -44,7 +44,7 @@ export default function LoginPage() {
       // Track sign-in event with ThriveStack
       thriveStackTrack([
         {
-          event_name: "signed_up",
+          event_name: "signed_in",
           user_id: email, // or use your app's userId
           timestamp: new Date().toISOString(),
           properties: {
