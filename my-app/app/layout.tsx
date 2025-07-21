@@ -24,15 +24,47 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr || typeof window === 'undefined' || !window.thrivestack) return;
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return;
 
-    const user = JSON.parse(userStr);
+      const user = JSON.parse(userStr);
 
-    window.thrivestack.setUser("{User_Id}", "{User_Email}");
+      const thriveScript = document.createElement('script');
+      thriveScript.src = 'https://ts-script.app.thrivestack.ai/latest/thrivestack.js';
+      thriveScript.async = true;
+      thriveScript.setAttribute('data-api-key', '/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A=');
+      thriveScript.setAttribute('data-source', 'product');
 
-    if (user.orgId && user.orgName) {
-      window.thrivestack.setGroup("{Group_Id}", "{Group_Domain}", "{Group_Name}");
+      thriveScript.onload = () => {
+        // Wait for `window.thrivestack` to become available
+        const interval = setInterval(() => {
+          if (window.thrivestack) {
+            clearInterval(interval);
+
+            window.thrivestack.setUser(user.id, user.email, {
+              user_name: user.name,
+              plan_type: user.plan || 'free',
+            });
+
+            if (user.orgId && user.orgName) {
+              window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
+                plan_name: 'Starter',
+                employee_count: 1,
+              });
+            }
+          }
+        }, 50);
+
+        // Timeout fallback
+        setTimeout(() => clearInterval(interval), 5000);
+      };
+
+      thriveScript.onerror = () => {
+        console.error('Failed to load ThriveStack script');
+      };
+
+      document.head.appendChild(thriveScript);
     }
   }, []);
 
