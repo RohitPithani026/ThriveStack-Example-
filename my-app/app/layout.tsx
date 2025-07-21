@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
-import { waitForThriveStack } from '@/lib/thrivestack';
+import { loadThriveScript, waitForThriveStack } from '@/lib/thrivestack';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -30,21 +30,29 @@ export default function RootLayout({
 
     const user = JSON.parse(userStr);
 
-    waitForThriveStack(() => {
-      window.thrivestack.setUser(user.id, user.email, {
-        user_name: user.name,
-        plan_type: user.plan || 'free',
-      });
+    loadThriveScript()
+      .then(() => {
+        if (!window.thrivestack) {
+          console.error("ThriveStack not initialized");
+          return;
+        }
 
-      if (user.orgId && user.orgName) {
-        window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
-          plan_name: 'Starter',
-          employee_count: 1,
+        window.thrivestack.setUser(user.id, user.email, {
+          user_name: user.name,
+          plan_type: user.plan || 'free',
         });
-      }
-    });
-  }, []);
 
+        if (user.orgId && user.orgName) {
+          window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
+            plan_name: 'Starter',
+            employee_count: 1,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load ThriveStack:", err);
+      });
+  }, []);
 
   useEffect(() => {
     // Initialize Amplitude
