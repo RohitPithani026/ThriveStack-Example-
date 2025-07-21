@@ -776,7 +776,7 @@
          */
         getSessionId() {
             const sessionCookieName = 'thrivestack_session';
-            
+
             try {
                 // Try to get existing session from cookies
                 const cookies = document.cookie.split(';');
@@ -795,7 +795,7 @@
                     // Try to parse as new format (Base64 JSON)
                     try {
                         const sessionData = JSON.parse(atob(sessionCookieValue));
-                        
+
                         // Validate structure
                         if (sessionData.sessionId && sessionData.lastActivity) {
                             const lastActivity = new Date(sessionData.lastActivity);
@@ -836,7 +836,7 @@
         createNewSession() {
             const sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
             const now = new Date().toISOString();
-            
+
             const sessionData = {
                 sessionId: sessionId,
                 startTime: now,
@@ -854,7 +854,7 @@
          */
         migrateOldSession(oldSessionId) {
             const now = new Date().toISOString();
-            
+
             const sessionData = {
                 sessionId: oldSessionId,
                 startTime: now, // We don't know the original start time
@@ -871,7 +871,7 @@
          */
         setSessionCookie(sessionData) {
             const sessionCookieName = 'thrivestack_session';
-            
+
             try {
                 const encodedData = btoa(JSON.stringify(sessionData));
                 const cookieValue = `${sessionCookieName}=${encodedData};path=/;SameSite=Lax`;
@@ -901,7 +901,7 @@
          */
         updateSessionActivityImmediate() {
             const sessionCookieName = 'thrivestack_session';
-            
+
             try {
                 // Get current session data
                 const cookies = document.cookie.split(';');
@@ -918,10 +918,10 @@
                 if (sessionCookieValue) {
                     try {
                         const sessionData = JSON.parse(atob(sessionCookieValue));
-                        
+
                         // Update last activity
                         sessionData.lastActivity = new Date().toISOString();
-                        
+
                         // Save updated session
                         this.setSessionCookie(sessionData);
                     } catch (parseError) {
@@ -953,7 +953,7 @@
             if (!this.isTrackingAllowed('functional')) {
                 return;
             }
-            
+
             // Get device ID - return early if not ready
             const deviceId = this.getDeviceId();
             if (!deviceId) {
@@ -967,7 +967,7 @@
             // Validate session first, then update activity
             const sessionId = this.getSessionId();
             this.updateSessionActivity();
-            
+
             // Get user and group IDs (from instance or cookies)
             const currentUserId = this.userId || this.getUserIdFromCookie() || "";
             const currentGroupId = this.groupId || this.getGroupIdFromCookie() || "";
@@ -1063,7 +1063,7 @@
             // Validate session first, then update activity
             const sessionId = this.getSessionId();
             this.updateSessionActivity();
-            
+
             // Get user and group IDs (from instance or cookies)
             const currentUserId = this.userId || this.getUserIdFromCookie() || "";
             const currentGroupId = this.groupId || this.getGroupIdFromCookie() || "";
@@ -1126,7 +1126,7 @@
             // Validate session first, then update activity
             const sessionId = this.getSessionId();
             this.updateSessionActivity();
-            
+
             const currentUserId = this.userId || this.getUserIdFromCookie() || "";
             const currentGroupId = this.groupId || this.getGroupIdFromCookie() || "";
 
@@ -1176,10 +1176,10 @@
         autoCapturePageVisit() {
             // Track initial page load
             window.addEventListener("load", () => this.capturePageVisit());
-            
+
             // Track navigation events
             window.addEventListener("popstate", () => this.capturePageVisit());
-            
+
             // Track history API calls for SPA support
             const originalPushState = history.pushState;
             history.pushState = (...args) => {
@@ -1467,10 +1467,8 @@
         let script = document.currentScript || Array.from(document.getElementsByTagName("script")).pop();
 
         // Priority order: data-api-key, then api-key (for backward compatibility)
-        let apiKey = script.getAttribute("data-api-key") || script.getAttribute("api-key");
-
-        // Priority order: data-source, then source (for backward compatibility)
-        let source = script.getAttribute("data-source") || script.getAttribute("source");
+        var apiKey = window.__THRIVE_API_KEY__;
+        var source = window.__THRIVE_SOURCE__; 
 
         if (apiKey && source) {
             let thriveStack = new ThriveStack({
