@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
+import { waitForThriveStack } from '@/lib/thrivestack';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -23,25 +24,31 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  useEffect(() => {
+
+useEffect(() => {
+  const identifyUser = async () => {
     const userStr = localStorage.getItem("user");
-    if (userStr) {
-      const user = JSON.parse(userStr);
+    if (!userStr) return;
 
-      if (window?.thrivestack) {
-        window.thrivestack('identify', {
-          userId: user.email,
-          email: user.email,
-          name: user.name
-        });
+    const user = JSON.parse(userStr);
 
-        if (user.orgId && user.orgDomain && user.orgName) {
-          window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
-        }
-      }
+    await waitForThriveStack();
+
+    window.thrivestack('identify', {
+      userId: user.email,
+      email: user.email,
+      name: user.name,
+    });
+
+    if (user.orgId && user.orgDomain && user.orgName) {
+      window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
     }
-  }, []);
 
+    console.log("✅ ThriveStack user + group identified:", user);
+  };
+
+  identifyUser();
+}, []);
 
   useEffect(() => {
     // Initialize Amplitude
