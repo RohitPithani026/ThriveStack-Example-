@@ -3,6 +3,10 @@ export interface ThriveStackEvent {
   user_id: string;
   timestamp?: string;
   properties?: Record<string, any>;
+  context?: {
+    group_id?: string;
+    [key: string]: any;
+  };
 }
 
 // Initialize the script

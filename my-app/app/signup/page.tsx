@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
+import { thriveStackTrack } from "@/lib/thrivestack";
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -47,15 +48,32 @@ export default function SignupPage() {
 
     // Simulate account creation
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      localStorage.setItem("user", JSON.stringify({ email, name }))
-      router.push("/dashboard")
+      localStorage.setItem("user", JSON.stringify({ email, name }));
+
+      // ✅ ThriveStack event tracking
+      thriveStackTrack([
+        {
+          event_name: "account_created",
+          user_id: email,
+          timestamp: new Date().toISOString(),
+          properties: {
+            account_domain: email.split("@")[1],
+            account_id: "acme-demo-id",
+            account_name: name
+          },
+          context: {
+            group_id: "acme-demo-id"
+          }
+        }
+      ]);
+
+      router.push("/dashboard");
     } catch (err) {
-      setError("Failed to create account")
-    } finally {
-      setIsLoading(false)
+      setError("Failed to create account");
     }
+
   }
 
   return (
