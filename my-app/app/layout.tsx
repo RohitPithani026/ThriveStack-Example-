@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
-import { loadThriveScript } from '@/lib/thrivestack';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -26,34 +25,16 @@ export default function RootLayout({
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
-    if (!userStr) return;
+    if (!userStr || typeof window === 'undefined' || !window.thrivestack) return;
 
     const user = JSON.parse(userStr);
 
-    loadThriveScript()
-      .then(() => {
-        if (!window.thrivestack) {
-          console.error("Still no window.thrivestack");
-          return;
-        }
+    window.thrivestack.setUser("{User_Id}", "{User_Email}");
 
-        window.thrivestack.setUser(user.id, user.email, {
-          user_name: user.name,
-          plan_type: user.plan || 'free',
-        });
-
-        if (user.orgId && user.orgName) {
-          window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
-            plan_name: 'Starter',
-            employee_count: 1,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("ThriveStack load failed:", err);
-      });
+    if (user.orgId && user.orgName) {
+      window.thrivestack.setGroup("{Group_Id}", "{Group_Domain}", "{Group_Name}");
+    }
   }, []);
-
 
   useEffect(() => {
     // Initialize Amplitude
@@ -148,18 +129,18 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* <script
-          src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
-          data-api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
-          data-source="marketing"
-          async
-        ></script>
         <script
           src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
           data-api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
           data-source="product"
           async
-        ></script> */}
+        ></script>
+        <script
+          src="https://ts-script.app.thrivestack.ai/latest/thrivestack.js"
+          data-api-key="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
+          data-source="marketing"
+          async
+        ></script>
       </head>
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
