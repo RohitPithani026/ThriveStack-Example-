@@ -60,13 +60,15 @@ export default function SignupPage() {
 
       localStorage.setItem("user", JSON.stringify(user));
 
-      window.thrivestack('identify', {
-        userId: user.email,
-        email: user.email,
-        name: user.name,
-      });
+      if (typeof window !== 'undefined' && window.thrivestack) {
+        // Identify the user
+        window.thrivestack('identify', {
+          userId: user.email,
+          email: user.email,
+          name: user.name
+        });
 
-      if (user.orgId && user.orgDomain && user.orgName) {
+        // Set group/account tracking
         window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
       }
 
