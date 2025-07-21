@@ -25,27 +25,26 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const userStr = localStorage.getItem("user");
-    if (!userStr || !window.thrivestack) return;
+    if (!userStr) return;
 
     const user = JSON.parse(userStr);
 
-    // Set User
-    window.thrivestack.setUser(user.email, user.email, {
-      user_name: user.name,
-      plan_type: "free",
-    });
-
-    // Set Group (if available)
-    if (user.orgId && user.orgName) {
-      window.thrivestack.setGroup(user.email, user.orgId, user.orgName, {
-        plan_name: "Starter",
-        employee_count: 1,
+    waitForThriveStack(() => {
+      window.thrivestack.setUser(user.email, user.email, {
+        user_name: user.name,
+        plan_type: "free",
       });
-    }
+
+      if (user.orgId && user.orgName) {
+        window.thrivestack.setGroup(user.orgId, user.email, user.orgName, {
+          plan_name: "Starter",
+          employee_count: 1,
+        });
+      }
+    });
   }, []);
+
 
 
   useEffect(() => {

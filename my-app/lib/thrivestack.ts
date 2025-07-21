@@ -1,12 +1,14 @@
-export function waitForThriveStack(): Promise<void> {
-  return new Promise((resolve) => {
-    const check = () => {
-      if (typeof window !== 'undefined' && window.thrivestack) {
-        resolve();
-      } else {
-        setTimeout(check, 100);
-      }
-    };
-    check();
-  });
+// lib/thrivestack.ts
+export function waitForThriveStack(callback: () => void, retryDelay = 100) {
+  if (typeof window === "undefined") return;
+
+  const wait = () => {
+    if (window.thrivestack) {
+      callback();
+    } else {
+      setTimeout(wait, retryDelay);
+    }
+  };
+
+  wait();
 }
