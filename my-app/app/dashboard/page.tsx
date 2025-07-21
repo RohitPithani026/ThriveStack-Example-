@@ -15,24 +15,28 @@ interface Product {
 }
 
 export default function DashboardOverviewPage() {
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.thrivestack) {
-      window.thrivestack.track([
-        {
-          event_name: "signed_up",
-          properties: {
-            user_email: "john.doe@acme.xyz",
-            user_name: "John Doe",
-            utm_campaign: "customer_success",
-            utm_medium: "referral",
-            utm_source: "twitter",
-            utm_term: "free_trial",
-          },
-          user_id: "18f716ac-37a4-464f-adb7-3cc30032308c",
-          timestamp: new Date().toISOString(),
+    useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const userStr = localStorage.getItem("user");
+    if (!userStr || !window.thrivestack) return;
+
+    const user = JSON.parse(userStr);
+
+    window.thrivestack.track([
+      {
+        event_name: "dashboard_viewed",
+        properties: {
+          user_email: user.email,
+          user_name: user.name,
+          utm_campaign: "default",
+          utm_medium: "direct",
+          utm_source: "dashboard",
         },
-      ]);
-    }
+        user_id: user.email,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
   }, []);
 
   // Mock data for products (can be fetched from an API in a real app)

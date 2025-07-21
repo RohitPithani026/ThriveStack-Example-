@@ -60,31 +60,29 @@ export default function LoginPage() {
       if (typeof window !== "undefined" && window.thrivestack) {
         window.thrivestack.setUser(email, email, {
           user_name: name,
-          plan_type: "free" // or dynamically set
+          plan_type: "free"
         });
 
-        window.thrivestack.setGroup(email, "account_123", "My Startup", {
+        // Optional: If user belongs to an org/account
+        window.thrivestack.setGroup(email, "org_123", "My Company", {
           plan_name: "Starter",
-          employee_count: 1
+          employee_count: 5
         });
 
-        window.thrivestack.track([
-          {
-            event_name: "signed_up",
-            user_id: email,
-            timestamp: new Date().toISOString(),
-            properties: {
-              user_email: email,
-              user_name: name,
-              utm_campaign: "organic",
-              utm_medium: "direct",
-              utm_source: "website"
-            }
+        // Send "signed_up" event
+        window.thrivestack.track([{
+          event_name: "signed_up",
+          user_id: email,
+          timestamp: new Date().toISOString(),
+          properties: {
+            user_email: email,
+            user_name: name,
+            utm_campaign: "organic",
+            utm_source: "website"
           }
-        ]);
+        }]);
       }
-
-
+      
       router.push("/dashboard");
     } catch (err) {
       setError("Invalid credentials");

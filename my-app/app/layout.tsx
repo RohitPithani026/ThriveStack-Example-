@@ -25,28 +25,28 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    const identifyUser = async () => {
-      const userStr = localStorage.getItem("user");
-      if (!userStr) return;
+    if (typeof window === "undefined") return;
 
-      const user = JSON.parse(userStr);
-      await waitForThriveStack();
+    const userStr = localStorage.getItem("user");
+    if (!userStr || !window.thrivestack) return;
 
-      window.thrivestack('identify', {
-        userId: user.email,
-        email: user.email,
-        name: user.name,
+    const user = JSON.parse(userStr);
+
+    // Set User
+    window.thrivestack.setUser(user.email, user.email, {
+      user_name: user.name,
+      plan_type: "free",
+    });
+
+    // Set Group (if available)
+    if (user.orgId && user.orgName) {
+      window.thrivestack.setGroup(user.email, user.orgId, user.orgName, {
+        plan_name: "Starter",
+        employee_count: 1,
       });
-
-      if (user.orgId && user.orgDomain && user.orgName) {
-        window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
-      }
-
-      console.log("✅ ThriveStack user + group identified:", user);
-    };
-
-    identifyUser();
+    }
   }, []);
+
 
   useEffect(() => {
     // Initialize Amplitude
