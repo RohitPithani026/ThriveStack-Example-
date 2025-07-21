@@ -11,6 +11,21 @@ interface Product {
   sales: number
 }
 
+window.thrivestack.track([{
+        "event_name": "signed_up",
+        "properties": {
+            "user_email": "john.doe@acme.xyz",
+            "user_name": "John Doe",
+            "utm_campaign": "customer_success",
+            "utm_medium": "referral",
+            "utm_source": "twitter",
+            "utm_term": "free_trial"
+        },
+        "user_id": "18f716ac-37a4-464f-adb7-3cc30032308c",
+        "timestamp": "2025-07-21T07:58:57.375Z"
+    }]);
+
+
 export default function DashboardOverviewPage() {
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
