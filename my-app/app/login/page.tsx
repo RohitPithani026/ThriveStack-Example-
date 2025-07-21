@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
-import { waitForThriveStack } from "@/lib/thrivestack"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -57,8 +56,6 @@ export default function LoginPage() {
       };
 
       localStorage.setItem("user", JSON.stringify(user));
-
-      await waitForThriveStack();
 
       window.thrivestack('identify', {
         userId: user.email,
