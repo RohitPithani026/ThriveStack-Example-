@@ -54,12 +54,12 @@ export default function SignupPage() {
 
       // ✅ ThriveStack tracking
       if (isReady && typeof window !== "undefined") {
-        await setUser(email, email, {
+        window.thrivestack.setUser(email, email, {
           user_name: name,
           signup_date: new Date().toISOString(),
         });
 
-        await group({
+        window.thrivestack.group({
           user_id: email,
           group_id: "account_" + email,
           group_name: name + "'s Account",
