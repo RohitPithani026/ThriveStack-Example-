@@ -51,54 +51,113 @@ export default function SignupPage() {
 
       const user = { email, name };
       localStorage.setItem("user", JSON.stringify(user));
+      const timestamp = new Date().toISOString();
+      const userId = email;
+      const accountId = "account_" + email;
 
-      // ✅ ThriveStack tracking
-      if (isReady && typeof window !== "undefined") {
-        window.thrivestack.setUser(email, email, {
-          user_name: name,
-          signup_date: new Date().toISOString(),
-        });
+      // Debug ThriveStack availability
+      console.log("[DEBUG] Checking ThriveStack availability:", {
+        exists: typeof window.thrivestack !== 'undefined',
+        hasTrack: window.thrivestack?.track ? true : false,
+        hasSetUser: window.thrivestack?.setUser ? true : false,
+        hasGroup: window.thrivestack?.group ? true : false
+      });
 
-        window.thrivestack.group({
-          user_id: email,
-          group_id: "account_" + email,
-          group_name: name + "'s Account",
-          properties: {
-            plan_name: "Starter Plan",
-            employee_count: 1,
-          },
-        });
-
-        window.thrivestack.track([
-          {
-            event_name: "signed_up",
-            properties: {
-              user_email: email,
-              user_name: name,
-              signup_date: new Date().toISOString(),
-              utm_source: "website",
-              utm_campaign: "signup",
+      if (isReady && typeof window !== "undefined" && window.thrivestack) {
+        try {
+          // 1. Track user signup
+          const signupEvent = {
+            "event_name": "signed_up",
+            "properties": {
+              "user_email": email,
+              "user_name": name,
+              "utm_campaign": "customer_success",
+              "utm_medium": "referral",
+              "utm_source": "twitter",
+              "utm_term": "free_trial"
             },
+            "user_id": userId,
+            "timestamp": timestamp
+          };
+          
+          console.log("[DEBUG] Sending signup event to ThriveStack:", signupEvent);
+          window.thrivestack.track([signupEvent]);
+
+          // 2. Track account creation
+          const accountEvent = {
+            "event_name": "account_created",
+            "properties": {
+              "account_domain": window.location.hostname,
+              "account_id": accountId,
+              "account_name": name + "'s Account"
+            },
+            "user_id": userId,
+            "timestamp": timestamp,
+            "context": {
+              "group_id": accountId  // Matches account_id
+            }
+          };
+          
+          console.log("[DEBUG] Sending account creation to ThriveStack:", accountEvent);
+          window.thrivestack.track([accountEvent]);
+
+          // 3. Track user-company association
+          const userCompanyEvent = {
+            "event_name": "account_added_user",
+            "properties": {
+              "account_name": name + "'s Account",
+              "user_email": email
+            },
+            "user_id": userId,
+            "timestamp": timestamp,
+            "context": {
+              "group_id": accountId
+            }
+          };
+          
+          console.log("[DEBUG] Sending user-company association to ThriveStack:", userCompanyEvent);
+          window.thrivestack.track([userCompanyEvent]);
+
+          // 4. Set user data in ThriveStack
+          console.log("[DEBUG] Attempting to set user data in ThriveStack:", {
+            userId: userId,
+            userEmail: email
+          });
+          window.thrivestack.setUser(email, email, {
+            user_name: name,
+            signup_date: timestamp,
+          });
+          console.log("[DEBUG] Successfully set user data in ThriveStack");
+
+          // 5. Set group data in ThriveStack
+          const groupName = name + "'s Account";
+          const groupDomain = window.location.hostname;
+          
+          console.log("[DEBUG] Attempting to set group data in ThriveStack:", {
+            groupId: accountId,
+            groupDomain: groupDomain,
+            groupName: groupName
+          });
+          window.thrivestack.group({
             user_id: email,
-            timestamp: new Date().toISOString(),
-          },
-        ]);
+            group_id: accountId,
+            group_name: groupName,
+            properties: {
+              plan_name: "Starter Plan",
+              employee_count: 1,
+            },
+          });
+          console.log("[DEBUG] Successfully set group data in ThriveStack");
+
+          console.log("[DEBUG] All ThriveStack operations completed successfully");
+
+        } catch (e) {
+          console.error("[DEBUG] ThriveStack operation error:", e);
+        }
+      } else {
+        console.warn("[DEBUG] ThriveStack not available for tracking");
       }
-      console.log("hi")
-      window.thrivestack.track([{
-        "event_name": "signed_up",
-        "properties": {
-            "user_email": "john.doe@acme.xyz",
-            "user_name": "John Doe",
-            "utm_campaign": "customer_success",
-            "utm_medium": "referral",
-            "utm_source": "twitter",
-            "utm_term": "free_trial"
-        },
-        "user_id": "18f716ac-37a4-464f-adb7-3cc30032308c",
-        "timestamp": "2025-07-21T12:18:57.567Z"
-    }]);
-    
+      
       router.push("/dashboard");
     } catch (err) {
       setError("Failed to create account");
