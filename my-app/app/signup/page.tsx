@@ -47,7 +47,7 @@ export default function SignupPage() {
     }
 
     // Simulate account creation
-try {
+    try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const user = {
@@ -59,8 +59,6 @@ try {
       };
 
       localStorage.setItem("user", JSON.stringify(user));
-
-      await waitForThriveStack();
 
       window.thrivestack('identify', {
         userId: user.email,
