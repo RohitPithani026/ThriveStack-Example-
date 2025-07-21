@@ -75,3 +75,16 @@ export const thriveStackGroup = async (data: any): Promise<any> => {
  
   return window.thriveStack.group(data);
 };
+
+export const thriveStackSetGroup = async (
+  userId: string,
+  accountId: string,
+  accountName: string,
+  properties: Record<string, any> = {}
+): Promise<any> => {
+  if (!window.thriveStack) {
+    throw new Error('ThriveStack not initialized');
+  }
+
+  return window.thriveStack.setGroup(userId, accountId, accountName, properties);
+};

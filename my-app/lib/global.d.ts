@@ -10,7 +10,6 @@ declare global {
       init: (userId?: string, source?: string) => Promise<void>;
       identify: (data: any) => Promise<any>;
       group: (data: any) => Promise<any>;
-      [key: string]: any;
     };
   }
 }
