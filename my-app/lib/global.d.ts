@@ -4,6 +4,7 @@ declare global {
     gtag: (...args: any[]) => void;
     amplitude: any;  // Amplitude Analytics
     sessionReplay: any;  // Session Replay plugin
+    thrivestack: any; // ThriveStack Analytics
   }
 }
 

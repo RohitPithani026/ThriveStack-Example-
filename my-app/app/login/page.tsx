@@ -32,17 +32,39 @@ export default function LoginPage() {
     }
 
     // Simulate authentication (replace with real auth)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+    // try {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // For demo purposes, accept any email/password
-      localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
-      router.push("/dashboard")
+    //   // For demo purposes, accept any email/password
+    //   localStorage.setItem("user", JSON.stringify({ email, name: email.split("@")[0] }))
+    //   router.push("/dashboard")
+    // } catch (err) {
+    //   setError("Invalid credentials")
+    // } finally {
+    //   setIsLoading(false)
+    // }
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const user = { email, name: email.split("@")[0] };
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Identify user in ThriveStack
+      if (typeof window !== 'undefined' && window.thrivestack) {
+        window.thrivestack('identify', {
+          userId: user.email,
+          email: user.email,
+          name: user.name,
+        });
+      }
+
+      router.push("/dashboard");
     } catch (err) {
-      setError("Invalid credentials")
-    } finally {
-      setIsLoading(false)
+      setError("Invalid credentials");
     }
+
   }
 
   return (
