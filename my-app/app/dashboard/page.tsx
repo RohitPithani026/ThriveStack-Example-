@@ -16,6 +16,8 @@ interface Product {
 }
 
 export default function DashboardOverviewPage() {
+
+
   const [user] = useState({
     userId: '12345',
     email: 'john.doe@example.com',
@@ -91,7 +93,7 @@ export default function DashboardOverviewPage() {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600">Welcome back!</p> {/* User name will be handled by layout */}
       </div>
-      <UserAuth user={user} />
+      <UserAuth  />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

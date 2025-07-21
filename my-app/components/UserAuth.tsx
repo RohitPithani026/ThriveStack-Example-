@@ -1,51 +1,58 @@
 'use client';
- 
-import React, { useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useThriveStack } from './ThriveStackProvider';
- 
-interface User {
+
+interface StoredUser {
   userId: string;
   email: string;
   name: string;
 }
- 
-interface UserAuthProps {
-  user: User | null;
-}
 
-export const UserAuth: React.FC<UserAuthProps> = ({ user }) => {
+export const UserAuth: React.FC = () => {
   const { isReady, setUser } = useThriveStack();
- 
+  const [user, setUserState] = useState<StoredUser | null>(null);
+
   useEffect(() => {
-    const handleUserTracking = async () => {
+    const saved = localStorage.getItem("user");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setUserState({
+        userId: parsed.userId || parsed.email,
+        email: parsed.email,
+        name: parsed.name,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const track = async () => {
       if (!isReady || !user) return;
- 
+
       try {
-        // Use the setUser method
         await setUser(user.userId, user.email, {
           user_name: user.name,
-          signup_date: new Date().toISOString(),
-          // Add any other custom properties
+          signup_source: 'localStorage',
         });
- 
-        console.log('User set successfully in ThriveStack');
-      } catch (error) {
-        console.error('Failed to set user in ThriveStack:', error);
+
+        console.log('✅ ThriveStack user set');
+      } catch (err) {
+        console.error('❌ Failed to set ThriveStack user:', err);
       }
     };
- 
-    handleUserTracking();
-  }, [isReady, user, setUser]);
- 
+
+    track();
+  }, [isReady, user]);
+
   if (!user) {
-    return <div>Please log in</div>;
+    return <div>Loading user...</div>;
   }
- 
+
   return (
-<div className="p-4">
-<h2>Welcome, {user.name}!</h2>
-<p>Email: {user.email}</p>
-<p>ThriveStack Status: {isReady ? 'Ready' : 'Loading...'}</p>
-</div>
+    <div className="p-4">
+      <h2>Welcome, {user.name}!</h2>
+      <p>Email: {user.email}</p>
+      <p>ThriveStack Status: {isReady ? 'Ready' : 'Loading...'}</p>
+    </div>
   );
 };
