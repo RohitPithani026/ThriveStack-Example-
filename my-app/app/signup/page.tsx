@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
+import { waitForThriveStack } from "@/lib/thrivestack"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -46,15 +47,34 @@ export default function SignupPage() {
     }
 
     // Simulate account creation
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      localStorage.setItem("user", JSON.stringify({ email, name }))
-      router.push("/dashboard")
+      const user = {
+        email,
+        name: email.split("@")[0],
+        orgId: "org-001", // from your backend/user object
+        orgDomain: "acme.com",
+        orgName: "Acme Corporation"
+      };
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      await waitForThriveStack();
+
+      window.thrivestack('identify', {
+        userId: user.email,
+        email: user.email,
+        name: user.name,
+      });
+
+      if (user.orgId && user.orgDomain && user.orgName) {
+        window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
+      }
+
+      router.push("/dashboard");
     } catch (err) {
-      setError("Failed to create account")
-    } finally {
-      setIsLoading(false)
+      setError("Invalid credentials");
     }
   }
 
