@@ -84,6 +84,7 @@ export default function SignupPage() {
           },
         ]);
       }
+      console.log("hi")
       window.thrivestack.track([{
         "event_name": "signed_up",
         "properties": {

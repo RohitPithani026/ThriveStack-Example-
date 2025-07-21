@@ -41,22 +41,7 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(user));
 
       // ✅ Track Login in ThriveStack
-      if (isReady) {
-        await setUser("abc@123", "abc@123", {
-          user_name: "user.name",
-          login_time: new Date().toISOString(),
-        });
 
-        await group({
-          user_id: user.email,
-          group_id: "account_" + user.email,
-          group_name: name + "'s Account",
-          properties: {
-            plan_name: "Starter Plan",
-            employee_count: 1,
-          },
-        });
-      }
 
       router.push("/dashboard");
     } catch (err) {
