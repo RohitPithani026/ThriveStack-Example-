@@ -16,24 +16,26 @@ export function waitForThriveStack(callback: () => void, delay = 100) {
 
 export function loadThriveScript(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const existingScript = document.querySelector(
-      'script[src*="ts-script.app.thrivestack.ai"]'
-    );
+    if (typeof window === 'undefined') return reject("Window not available");
 
-    if (existingScript) {
-      resolve(); // already loaded
-      return;
-    }
+    // Already loaded?
+    if (window.thrivestack) return resolve();
 
     const script = document.createElement('script');
     script.src = 'https://ts-script.app.thrivestack.ai/latest/thrivestack.js';
-    script.setAttribute('data-api-key', '/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A=');
-    script.setAttribute('data-source', 'product'); // or 'marketing'
     script.async = true;
+    script.setAttribute("data-api-key", "/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A=");
+    script.setAttribute("data-source", "product");
 
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Failed to load ThriveStack script'));
+    script.onload = () => {
+      if (window.thrivestack) {
+        resolve();
+      } else {
+        reject("ThriveStack failed to initialize");
+      }
+    };
 
+    script.onerror = () => reject("Failed to load ThriveStack script");
     document.head.appendChild(script);
   });
 }

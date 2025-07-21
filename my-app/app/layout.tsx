@@ -37,26 +37,23 @@ export default function RootLayout({
           return;
         }
 
-        // window.thrivestack.setUser(user.id, user.email, {
-        //   user_name: user.name,
-        //   plan_type: user.plan || 'free',
-        // });
+        // Example:
+        window.thrivestack.setUser(user.id, user.email, {
+          user_name: user.name,
+          plan_type: user.plan || 'free',
+        });
 
-        window.thrivestack.setUser("{User_Id}", "{User_Email}");
-        window.thrivestack.setGroup("{Group_Id}", "{Group_Domain}", "{Group_Name}");
-
-
-        // if (user.orgId && user.orgName) {
-        //   window.thrivestack.setGroup(user.id, user.orgId, user.orgName, {
-        //     plan_name: 'Starter',
-        //     employee_count: 1,
-        //   });
-        // }
+        window.thrivestack.setGroup(
+          user.orgId || "{Group_Id}",
+          user.orgDomain || "{Group_Domain}",
+          user.orgName || "{Group_Name}"
+        );
       })
       .catch((err) => {
         console.error("Failed to load ThriveStack:", err);
       });
   }, []);
+
 
   useEffect(() => {
     // Initialize Amplitude
