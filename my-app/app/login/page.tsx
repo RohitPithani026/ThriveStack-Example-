@@ -57,17 +57,33 @@ export default function LoginPage() {
 
       localStorage.setItem("user", JSON.stringify(user));
 
-      if (typeof window !== 'undefined' && window.thrivestack) {
-        // Identify the user
-        window.thrivestack('identify', {
-          userId: user.email,
-          email: user.email,
-          name: user.name
+      if (typeof window !== "undefined" && window.thrivestack) {
+        window.thrivestack.setUser(email, email, {
+          user_name: name,
+          plan_type: "free" // or dynamically set
         });
 
-        // Set group/account tracking
-        window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
+        window.thrivestack.setGroup(email, "account_123", "My Startup", {
+          plan_name: "Starter",
+          employee_count: 1
+        });
+
+        window.thrivestack.track([
+          {
+            event_name: "signed_up",
+            user_id: email,
+            timestamp: new Date().toISOString(),
+            properties: {
+              user_email: email,
+              user_name: name,
+              utm_campaign: "organic",
+              utm_medium: "direct",
+              utm_source: "website"
+            }
+          }
+        ]);
       }
+
 
       router.push("/dashboard");
     } catch (err) {
