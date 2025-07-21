@@ -47,24 +47,32 @@ export default function LoginPage() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const user = { email, name: email.split("@")[0] };
+      const user = {
+        email,
+        name: email.split("@")[0],
+        orgId: "org-001", // from your backend/user object
+        orgDomain: "acme.com",
+        orgName: "Acme Corporation"
+      };
 
       localStorage.setItem("user", JSON.stringify(user));
 
-      // ✅ Identify user in ThriveStack
       if (typeof window !== 'undefined' && window.thrivestack) {
+        // Identify the user
         window.thrivestack('identify', {
           userId: user.email,
           email: user.email,
-          name: user.name,
+          name: user.name
         });
+
+        // Set group/account tracking
+        window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
       }
 
       router.push("/dashboard");
     } catch (err) {
       setError("Invalid credentials");
     }
-
   }
 
   return (

@@ -27,15 +27,21 @@ export default function RootLayout({
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const user = JSON.parse(userStr);
+
       if (window?.thrivestack) {
         window.thrivestack('identify', {
           userId: user.email,
           email: user.email,
-          name: user.name,
+          name: user.name
         });
+
+        if (user.orgId && user.orgDomain && user.orgName) {
+          window.thrivestack.setGroup(user.orgId, user.orgDomain, user.orgName);
+        }
       }
     }
   }, []);
+
 
   useEffect(() => {
     // Initialize Amplitude
