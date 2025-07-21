@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LayoutDashboard, ShoppingBag, LogOut, Users } from "lucide-react"
 import { event } from "@/lib/gtag"
+import { trackFeatureUsed } from "@/lib/thrivestack";
 
 interface User {
   email: string
@@ -42,7 +43,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
 
   if (!user) {
-    return <div>Loading...</div> 
+    return <div>Loading...</div>
   }
 
   const navItems = [
@@ -83,13 +84,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => (
             <Link key={item.name} href={item.href}>
               <button
-                onClick={() =>
+                onClick={() => {
+                  // GA event
                   event({
                     action: "sidebar_click",
                     category: "Navigation",
                     label: item.label,
-                  })
-                }
+                  });
+
+                  // ThriveStack feature usage tracking
+                  const storedUser = localStorage.getItem("user");
+                  const user = storedUser ? JSON.parse(storedUser) : null;
+
+                  if (user) {
+                    trackFeatureUsed(
+                      user.email,
+                      `navigate_to_${item.name.toLowerCase()}`,
+                      "user",
+                      "ac8db7ba-5139-4911-ba6e-523fd9c4704b" // Replace with real group_id if dynamic
+                    );
+                  }
+                }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${pathname === item.href ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"
                   }`}
               >

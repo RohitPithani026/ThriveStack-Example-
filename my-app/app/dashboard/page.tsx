@@ -4,7 +4,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserAuth } from "@/components/UserAuth"
 import { TrendingUp, DollarSign, Users, Package } from "lucide-react"
-import { useState } from "react";
+import { trackFeatureUsed } from "@/lib/thrivestack";
 
 interface Product {
   id: string

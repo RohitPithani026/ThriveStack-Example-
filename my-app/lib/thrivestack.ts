@@ -80,3 +80,25 @@ export const thriveStackTrack = (events: ThriveStackEvent[]): void => {
   if (!window.thriveStack?.track) throw new Error('ThriveStack track() not available');
   window.thriveStack.track(events);
 };
+
+export const trackFeatureUsed = (
+  userId: string,
+  featureName: string,
+  userRole: string,
+  groupId?: string
+): void => {
+  const event: ThriveStackEvent = {
+    event_name: "feature_used",
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+    properties: {
+      feature_name: featureName,
+      user_role: userRole,
+    },
+    context: {
+      group_id: groupId,
+    },
+  };
+
+  thriveStackTrack([event]);
+};
