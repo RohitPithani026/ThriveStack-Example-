@@ -63,9 +63,7 @@ export default function SignupPage() {
             user_name: email.split("@")[0],
             utm_source: "login_form", // or dynamic source
           }
-        }
-      ]);
-      thriveStackTrack([
+        },
         {
           event_name: "account_created",
           user_id: email,
