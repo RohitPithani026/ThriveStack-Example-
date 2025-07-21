@@ -52,7 +52,7 @@ export default function SignupPage() {
 
       localStorage.setItem("user", JSON.stringify({ email, name }));
 
-      // ✅ ThriveStack event tracking
+      // Track account created event
       thriveStackTrack([
         {
           event_name: "account_created",
@@ -60,20 +60,30 @@ export default function SignupPage() {
           timestamp: new Date().toISOString(),
           properties: {
             account_domain: email.split("@")[1],
-            account_id: "acme-demo-id",
+            account_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b",
             account_name: name
           },
           context: {
-            group_id: "acme-demo-id"
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+          }
+        },
+        {
+          event_name: "account_added_user",
+          user_id: email,
+          timestamp: new Date().toISOString(),
+          properties: {
+            account_name: name,
+            user_email: email
+          },
+          context: {
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
           }
         }
       ]);
-
       router.push("/dashboard");
     } catch (err) {
       setError("Failed to create account");
     }
-
   }
 
   return (
