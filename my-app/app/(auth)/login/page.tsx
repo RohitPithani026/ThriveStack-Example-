@@ -42,12 +42,12 @@ export default function LoginPage() {
 
       // ✅ Track Login in ThriveStack
       if (isReady) {
-        window.thrivestack.setUser(email, email, {
+        await setUser(email, email, {
           user_name: user.name,
           login_time: new Date().toISOString(),
         });
 
-        window.thrivestack.group({
+        await group({
           user_id: user.email,
           group_id: "account_" + user.email,
           group_name: name + "'s Account",
