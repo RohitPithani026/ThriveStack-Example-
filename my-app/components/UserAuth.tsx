@@ -10,7 +10,7 @@ interface StoredUser {
 }
 
 export const UserAuth: React.FC = () => {
-  const { isReady, setUser } = useThriveStack();
+  const { isReady, setUser, group } = useThriveStack();
   const [user, setUserState] = useState<StoredUser | null>(null);
 
   useEffect(() => {
@@ -26,22 +26,29 @@ export const UserAuth: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const track = async () => {
+    const setupThriveStack = async () => {
       if (!isReady || !user) return;
 
       try {
+        // Set the user
         await setUser(user.userId, user.email, {
           user_name: user.name,
           signup_source: 'localStorage',
         });
-
         console.log('✅ ThriveStack user set');
+
+        // Set the group (account/org)
+        await group(user.userId, 'ac8db7ba-5139-4911-ba6e-523fd9c4704b', 'Acme Inc', {
+          plan: 'Free Trial',
+          created_at: new Date().toISOString(),
+        });
+        console.log('✅ ThriveStack group set');
       } catch (err) {
-        console.error('❌ Failed to set ThriveStack user:', err);
+        console.error('❌ ThriveStack setup failed:', err);
       }
     };
 
-    track();
+    setupThriveStack();
   }, [isReady, user]);
 
   if (!user) {
