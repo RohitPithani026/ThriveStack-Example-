@@ -6,43 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
 import { event } from '../lib/gtag';
-import { useEffect } from "react"
 
 export default function HomePage() {
-    useEffect(() => {
-    const newVisitor = () => {
-      try {
-        const existing = localStorage.getItem("new_visitor_tracked")
-        if (existing) return
-
-        const userId = "anon_" + Math.random().toString(36).slice(2, 10)
-        localStorage.setItem("user", userId)
-        localStorage.setItem("new_visitor_tracked", "true")
-
-        if (typeof window !== 'undefined' && window.thriveStack?.track) {
-          window.thriveStack.track([
-            {
-              event_name: "new_visitor",
-              user_id: userId,
-              timestamp: new Date().toISOString(),
-              properties: {
-                referrer: document.referrer || "direct",
-                page: window.location.pathname,
-                source_url: window.location.href,
-              },
-              context: {
-                group_id: "public",
-              },
-            },
-          ])
-        }
-      } catch (error) {
-        console.error("Error tracking new visitor:", error)
-      }
-    }
-
-    newVisitor()
-  }, [])
 
   return (
     <div className="min-h-screen bg-white">
