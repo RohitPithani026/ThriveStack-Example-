@@ -6,8 +6,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
 import { event } from '../lib/gtag';
+import { useEffect } from "react"
+import { thriveStackTrack } from "@/lib/thrivestack"
 
 export default function HomePage() {
+
+  useEffect(() => {
+    const newVisitor = () => {
+      try {
+        const existing = localStorage.getItem("new_visitor_tracked")
+        if (existing) return
+
+        const userId = "anon_" + Math.random().toString(36).slice(2, 10)
+        localStorage.setItem("user", userId)
+        localStorage.setItem("new_visitor_tracked", "true")
+
+        thriveStackTrack([
+          {
+            event_name: "new_visitor",
+            user_id: userId,
+            timestamp: new Date().toISOString(),
+            properties: {
+              referrer: document.referrer || "direct",
+              page: window.location.pathname,
+              source_url: window.location.href,
+            },
+            context: {
+              group_id: "public",
+            },
+          },
+        ])
+
+      } catch (error) {
+        console.error("Error tracking new visitor:", error)
+      }
+    }
+
+    newVisitor()
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
@@ -81,12 +117,31 @@ export default function HomePage() {
               </Button>
             </Link>
             <Button onClick={() => {
+              const user = JSON.parse(localStorage.getItem("user") || "{}");
+              const userId = user; 
+
               console.log("CTA clicked");
               event({
                 action: 'cta_click',
                 category: 'CTA',
                 label: 'Start Free Trial',
               });
+
+              thriveStackTrack([
+                {
+                  event_name: "cta_click",
+                  user_id: userId,
+                  timestamp: new Date().toISOString(),
+                  properties: {
+                    label: "Start Free Trial (Bottom)",
+                    page: window.location.pathname,
+                    source_url: window.location.href,
+                  },
+                  context: {
+                    group_id: "public",
+                  },
+                },
+              ]);
             }} size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
               Watch Demo
             </Button>
