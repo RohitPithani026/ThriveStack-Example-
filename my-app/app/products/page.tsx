@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus } from "lucide-react"
 import { event } from "@/lib/gtag"
+import { thriveStackTrack } from "@/lib/thrivestack"
 
 interface Product {
   id: string
@@ -114,23 +115,74 @@ export default function ProductsPage() {
                 <h3 className="font-semibold mb-2">{product.name}</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-blue-600">${product.price}</span>
-                  <Button onClick={() => {
-                    console.log("CTA clicked");
-                    event({
-                      action: 'first_action',
-                      category: 'Activation',
-                      label: 'Visited Product',
-                    });
-                  }} size="sm">Details</Button>
-                  <Button onClick={() => {
-                    console.log("CTA clicked");
-                    event({
-                      action: "purchase_course",
-                      category: "Ecommerce",
-                      label: "Paid Course Purchased",
-                      value: 499, 
-                    });
-                  }} size="sm">Buy Now</Button>
+                  <Button
+                    onClick={() => {
+                      const user = JSON.parse(localStorage.getItem("user") || "{}");
+                      const userId = user.email; // or `user.id` if available
+                      const groupId = "ac8db7ba-5139-4911-ba6e-523fd9c4704b"; // replace with actual group/account ID
+
+                      // GA event (already existing)
+                      event({
+                        action: 'first_action',
+                        category: 'Activation',
+                        label: 'Visited Product',
+                      });
+
+                      // ✅ ThriveStack product_viewed event
+                      thriveStackTrack([
+                        {
+                          event_name: "product_viewed",
+                          user_id: userId,
+                          timestamp: new Date().toISOString(),
+                          properties: {
+                            product_name: product.name,
+                            category: product.category,
+                          },
+                          context: {
+                            group_id: groupId,
+                          },
+                        },
+                      ]);
+                    }}
+                    size="sm"
+                  >
+                    Details
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const user = JSON.parse(localStorage.getItem("user") || "{}");
+                      const userId = user.email; // or user.id if you store it
+                      const groupId = "ac8db7ba-5139-4911-ba6e-523fd9c4704b"; // replace with actual value
+
+                      // GA event
+                      event({
+                        action: "purchase_course",
+                        category: "Ecommerce",
+                        label: "Paid Course Purchased",
+                        value: product.price, // match the actual price
+                      });
+
+                      // ThriveStack tracking
+                      thriveStackTrack([
+                        {
+                          event_name: "product_purchased",
+                          user_id: userId,
+                          timestamp: new Date().toISOString(),
+                          properties: {
+                            product_name: product.name,
+                            category: product.category,
+                            price: product.price,
+                          },
+                          context: {
+                            group_id: groupId,
+                          },
+                        },
+                      ]);
+                    }}
+                    size="sm"
+                  >
+                    Buy Now
+                  </Button>
                 </div>
               </div>
             </CardContent>
