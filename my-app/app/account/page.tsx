@@ -4,24 +4,57 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useEffect } from "react"
+import { thriveStackTrack } from "@/lib/thrivestack" // ✅ import tracking function
 
 interface User {
   email: string
   name: string
+  userId?: string // in case it's stored too
 }
 
 export default function AccountSettingsPage() {
   const [user, setUser] = useState<User | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [name, setName] = useState("")
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
     if (userData) {
-      setUser(JSON.parse(userData))
+      const parsed = JSON.parse(userData)
+      setUser(parsed)
+      setName(parsed.name)
     }
   }, [])
 
+  const handleUpdate = () => {
+    if (!user) return;
+
+    // ✅ Simulate saving updated name (you can also call an API here)
+    const updatedUser = { ...user, name }
+    localStorage.setItem("user", JSON.stringify(updatedUser))
+    setUser(updatedUser)
+    setIsEditing(false)
+
+    // ✅ ThriveStack tracking
+    thriveStackTrack([
+      {
+        event_name: "profile_completed",
+        user_id: user.userId || user.email,
+        timestamp: new Date().toISOString(),
+        properties: {
+          section: "basic_info",
+        },
+        context: {
+          group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b", // 🔁 replace with real account ID
+        },
+      },
+    ])
+
+    console.log("✅ Profile updated and tracked")
+  }
+
   if (!user) {
-    return null // Layout handles loading state
+    return null
   }
 
   return (
@@ -42,9 +75,10 @@ export default function AccountSettingsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
                 type="text"
-                value={user.name}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                readOnly
+                readOnly={!isEditing}
               />
             </div>
             <div>
@@ -56,7 +90,11 @@ export default function AccountSettingsPage() {
                 readOnly
               />
             </div>
-            <Button>Update Profile</Button>
+            {isEditing ? (
+              <Button onClick={handleUpdate}>Save Changes</Button>
+            ) : (
+              <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+            )}
           </CardContent>
         </Card>
       </div>
