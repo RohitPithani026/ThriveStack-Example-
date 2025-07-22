@@ -6,8 +6,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
 import { event } from '../lib/gtag';
+import { thriveStackTrack } from "@/lib/thrivestack"
+import { useEffect } from "react"
 
 export default function HomePage() {
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    if (!user) {
+      thriveStackTrack([
+        {
+          event_name: "new_visitor",
+          user_id: "anonymous_" + Math.random().toString(36).substr(2, 9),
+          timestamp: new Date().toISOString(),
+          properties: {
+            source: document.referrer || "direct",
+            page: window.location.pathname,
+          },
+          context: {
+            group_id: "public",
+          },
+        },
+      ])
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
