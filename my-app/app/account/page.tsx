@@ -4,8 +4,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useEffect } from "react"
-import { thriveStackTrack } from "@/lib/thrivestack" // ✅ import tracking function
-
+import { thriveStackTrack } from "@/lib/thrivestack" 
 interface User {
   email: string
   name: string
