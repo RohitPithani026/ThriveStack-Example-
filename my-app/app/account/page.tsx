@@ -28,7 +28,6 @@ export default function AccountSettingsPage() {
   const handleUpdate = () => {
     if (!user) return;
 
-    // ✅ Simulate saving updated name (you can also call an API here)
     const updatedUser = { ...user, name }
     localStorage.setItem("user", JSON.stringify(updatedUser))
     setUser(updatedUser)
