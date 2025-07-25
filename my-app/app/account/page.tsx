@@ -8,7 +8,7 @@ import { thriveStackTrack } from "@/lib/thrivestack"
 interface User {
   email: string
   name: string
-  userId?: string // in case it's stored too
+  userId?: string 
 }
 
 export default function AccountSettingsPage() {
