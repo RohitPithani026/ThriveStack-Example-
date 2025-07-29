@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useThriveStack } from './ThriveStackProvider';
+import { thriveStackSetUser, thriveStackSetGroup } from '@/hooks/useAnalytics';
 
 interface StoredUser {
   userId: string;
@@ -10,8 +10,8 @@ interface StoredUser {
 }
 
 export const UserAuth: React.FC = () => {
-  const { isReady, setUser, group } = useThriveStack();
   const [user, setUserState] = useState<StoredUser | null>(null);
+  const [isThriveStackReady, setIsThriveStackReady] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("user");
@@ -27,29 +27,36 @@ export const UserAuth: React.FC = () => {
 
   useEffect(() => {
     const setupThriveStack = async () => {
-      if (!isReady || !user) return;
+      if (!user) return;
 
       try {
         // Set the user
-        await setUser(user.userId, user.email, {
+        await thriveStackSetUser(user.userId, user.email, {
           user_name: user.name,
           signup_source: 'localStorage',
         });
         console.log('✅ ThriveStack user set');
 
         // Set the group (account/org)
-        await group(user.userId, 'ac8db7ba-5139-4911-ba6e-523fd9c4704b', 'Acme Inc', {
-          plan: 'Free Trial',
-          created_at: new Date().toISOString(),
-        });
+        await thriveStackSetGroup(
+          'ac8db7ba-5139-4911-ba6e-523fd9c4704b', 
+          'acme.com', 
+          'Acme Inc', 
+          {
+            plan: 'Free Trial',
+            created_at: new Date().toISOString(),
+          }
+        );
         console.log('✅ ThriveStack group set');
+        
+        setIsThriveStackReady(true);
       } catch (err) {
         console.error('❌ ThriveStack setup failed:', err);
       }
     };
 
     setupThriveStack();
-  }, [isReady, user]);
+  }, [user]);
 
   if (!user) {
     return <div>Loading user...</div>;
@@ -59,7 +66,7 @@ export const UserAuth: React.FC = () => {
     <div className="p-4">
       <h2>Welcome, {user.name}!</h2>
       <p>Email: {user.email}</p>
-      <p>ThriveStack Status: {isReady ? 'Ready' : 'Loading...'}</p>
+      <p>ThriveStack Status: {isThriveStackReady ? 'Ready' : 'Loading...'}</p>
     </div>
   );
 };
