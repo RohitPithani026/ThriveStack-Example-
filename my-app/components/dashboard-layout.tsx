@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LayoutDashboard, ShoppingBag, LogOut, Users } from "lucide-react"
 import { event } from "@/lib/gtag"
-import { trackFeatureUsed } from "@/lib/thrivestack";
+import { trackFeatureUsed, trackButtonClick } from "@/hooks/useAnalytics";
 
 interface User {
   email: string
   name: string
+  userId?: string
 }
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -31,16 +32,45 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [router])
 
   const handleLogout = () => {
-    event({
-      action: "logout_click",
-      category: "Navigation",
-      label: "Sidebar: Logout",
-    })
+    if (user) {
+      // GA event
+      event({
+        action: "logout_click",
+        category: "Navigation",
+        label: "Sidebar: Logout",
+      })
+
+      // ThriveStack logout tracking
+      trackButtonClick(
+        user.userId || user.email,
+        "logout_button",
+        "dashboard_layout",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
 
     localStorage.removeItem("user")
     router.push("/")
   }
 
+  const handleNavigationClick = (itemName: string, itemLabel: string) => {
+    if (user) {
+      // GA event
+      event({
+        action: "sidebar_click",
+        category: "Navigation",
+        label: itemLabel,
+      });
+
+      // ThriveStack feature usage tracking
+      trackFeatureUsed(
+        user.userId || user.email,
+        `navigate_to_${itemName.toLowerCase()}`,
+        "user",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  }
 
   if (!user) {
     return <div>Loading...</div>
@@ -84,27 +114,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => (
             <Link key={item.name} href={item.href}>
               <button
-                onClick={() => {
-                  // GA event
-                  event({
-                    action: "sidebar_click",
-                    category: "Navigation",
-                    label: item.label,
-                  });
-
-                  // ThriveStack feature usage tracking
-                  const storedUser = localStorage.getItem("user");
-                  const user = storedUser ? JSON.parse(storedUser) : null;
-
-                  if (user) {
-                    trackFeatureUsed(
-                      user.email,
-                      `navigate_to_${item.name.toLowerCase()}`,
-                      "user",
-                      "ac8db7ba-5139-4911-ba6e-523fd9c4704b" // Replace with real group_id if dynamic
-                    );
-                  }
-                }}
+                onClick={() => handleNavigationClick(item.name, item.label)}
                 className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${pathname === item.href ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"
                   }`}
               >

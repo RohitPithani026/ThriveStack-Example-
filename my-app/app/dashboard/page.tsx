@@ -4,7 +4,8 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserAuth } from "@/components/UserAuth"
 import { TrendingUp, DollarSign, Users, Package } from "lucide-react"
-import { trackFeatureUsed } from "@/lib/thrivestack";
+import { trackFeatureUsed } from "@/hooks/useAnalytics";
+import { useEffect, useState } from "react";
 
 interface Product {
   id: string
@@ -15,7 +16,14 @@ interface Product {
   sales: number
 }
 
+interface User {
+  email: string
+  name: string
+  userId?: string 
+}
+
 export default function DashboardOverviewPage() {
+  const [user, setUser] = useState<User | null>(null)
 
   // Mock data for products (can be fetched from an API in a real app)
   const products: Product[] = [
@@ -80,11 +88,44 @@ export default function DashboardOverviewPage() {
     },
   ]
 
+  // Get user data on mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      const parsed = JSON.parse(userData)
+      setUser(parsed)
+    }
+  }, [])
+
+  // Track dashboard view on mount
+  useEffect(() => {
+    if (user) {
+      trackFeatureUsed(
+        user.userId || user.email,
+        "dashboard_view",
+        "user",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  }, [user]);
+
+  // Track when a product is clicked
+  const handleProductClick = (product: Product) => {
+    if (user) {
+      trackFeatureUsed(
+        user.userId || user.email,
+        "product_click",
+        "user",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome back!</p> {/* User name will be handled by layout */}
+        <p className="text-gray-600">Welcome back!</p>
       </div>
       <UserAuth  />
 
@@ -112,7 +153,11 @@ export default function DashboardOverviewPage() {
           <h2 className="text-xl font-bold mb-4">Recent Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {products.slice(0, 4).map((product) => (
-              <div key={product.id} className="border rounded-lg p-4">
+              <div
+                key={product.id}
+                className="border rounded-lg p-4 cursor-pointer hover:bg-gray-50"
+                onClick={() => handleProductClick(product)}
+              >
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}

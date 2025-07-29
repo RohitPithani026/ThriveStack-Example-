@@ -4,7 +4,8 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useEffect } from "react"
-import { thriveStackTrack } from "@/lib/thrivestack" 
+import { useAnalytics } from "@/hooks/useAnalytics"
+
 interface User {
   email: string
   name: string
@@ -15,6 +16,8 @@ export default function AccountSettingsPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState("")
+  
+  const analytics = useAnalytics();
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
@@ -26,16 +29,16 @@ export default function AccountSettingsPage() {
   }, [])
 
   const handleUpdate = () => {
-    if (!user) return;
+    if (!user || !analytics) return;
 
-    // ✅ Simulate saving updated name (you can also call an API here)
+    // ✅ Simulate saving updated name
     const updatedUser = { ...user, name }
     localStorage.setItem("user", JSON.stringify(updatedUser))
     setUser(updatedUser)
     setIsEditing(false)
 
     // ✅ ThriveStack tracking
-    thriveStackTrack([
+    analytics.track([
       {
         event_name: "profile_completed",
         user_id: user.userId || user.email,
@@ -44,7 +47,7 @@ export default function AccountSettingsPage() {
           section: "basic_info",
         },
         context: {
-          group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b", // 🔁 replace with real account ID
+          group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b",
         },
       },
     ])

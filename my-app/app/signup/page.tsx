@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
-import { thriveStackTrack } from "@/lib/thrivestack";
+import { thriveStackTrack, trackButtonClick } from "@/hooks/useAnalytics";
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -56,12 +56,15 @@ export default function SignupPage() {
       thriveStackTrack([
         {
           event_name: "signed_up",
-          user_id: email, // or use your app's userId
+          user_id: email,
           timestamp: new Date().toISOString(),
           properties: {
             user_email: email,
-            user_name: email.split("@")[0],
-            utm_source: "login_form", // or dynamic source
+            user_name: name,
+            utm_source: "signup_form",
+          },
+          context: {
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
           }
         },
         {
@@ -93,8 +96,29 @@ export default function SignupPage() {
       router.push("/dashboard");
     } catch (err) {
       setError("Failed to create account");
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  const handleButtonClick = () => {
+    console.log("CTA clicked");
+    event({
+      action: 'dashboard_visit',
+      category: 'User',
+      label: 'Initial Dashboard Load',
+    });
+    
+    // Track button click with ThriveStack
+    if (email) {
+      trackButtonClick(
+        email,
+        "create_account_button",
+        "signup_page",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -169,14 +193,12 @@ export default function SignupPage() {
                 />
               </div>
 
-              <Button onClick={() => {
-                console.log("CTA clicked");
-                event({
-                  action: 'dashboard_visit',
-                  category: 'User',
-                  label: 'Initial Dashboard Load',
-                });
-              }} type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                onClick={handleButtonClick} 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating account..." : "Create account"}
               </Button>
             </form>

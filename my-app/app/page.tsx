@@ -6,8 +6,119 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Check, Star, Zap, Shield, Globe } from "lucide-react"
 import { event } from '../lib/gtag';
+import { trackButtonClick, trackPageView } from "@/hooks/useAnalytics";
+import { useEffect, useState } from "react";
+
+interface User {
+  email: string
+  name: string
+  userId?: string 
+}
 
 export default function HomePage() {
+  const [user, setUser] = useState<User | null>(null)
+
+  // Get user data on mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      const parsed = JSON.parse(userData)
+      setUser(parsed)
+    }
+  }, [])
+
+  // Track page view on mount
+  useEffect(() => {
+    trackPageView(
+      user?.userId || user?.email || "anonymous",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  }, [user]);
+
+  const handleSignInClick = () => {
+    console.log("CTA clicked");
+    event({
+      action: 'sign_up',
+      category: 'User',
+      label: 'Email Sign Up',
+    });
+    
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "sign_in_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handleGetStartedClick = () => {
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "get_started_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handleStartFreeTrialClick = () => {
+    console.log("CTA clicked");
+    event({
+      action: 'cta_click',
+      category: 'CTA',
+      label: 'Start Free Trial',
+    });
+    
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "start_free_trial_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handleWatchDemoClick = () => {
+    console.log("CTA clicked");
+    event({
+      action: 'cta_click',
+      category: 'CTA',
+      label: 'Watch Demo',
+    });
+    
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "watch_demo_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handlePricingGetStartedClick = (plan: string) => {
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      `${plan.toLowerCase()}_plan_button`,
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handleContactSalesClick = () => {
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "contact_sales_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
+
+  const handleFinalCTAClick = () => {
+    trackButtonClick(
+      user?.userId || user?.email || "anonymous",
+      "final_cta_button",
+      "home_page",
+      "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -36,17 +147,10 @@ export default function HomePage() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button onClick={() => {
-                  console.log("CTA clicked");
-                  event({
-                    action: 'sign_up',
-                    category: 'User',
-                    label: 'Email Sign Up',
-                  });
-                }} variant="ghost">Sign In</Button>
+                <Button onClick={handleSignInClick} variant="ghost">Sign In</Button>
               </Link>
               <Link href="/signup">
-                <Button>Get Started</Button>
+                <Button onClick={handleGetStartedClick}>Get Started</Button>
               </Link>
             </div>
           </div>
@@ -69,25 +173,11 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <Button onClick={() => {
-                console.log("CTA clicked");
-                event({
-                  action: 'cta_click',
-                  category: 'CTA',
-                  label: 'Watch Demo',
-                });
-              }} size="lg" className="text-lg px-8 py-3">
+              <Button onClick={handleStartFreeTrialClick} size="lg" className="text-lg px-8 py-3">
                 Start Free Trial
               </Button>
             </Link>
-            <Button onClick={() => {
-              console.log("CTA clicked");
-              event({
-                action: 'cta_click',
-                category: 'CTA',
-                label: 'Start Free Trial',
-              });
-            }} size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
+            <Button onClick={handleWatchDemoClick} size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent">
               Watch Demo
             </Button>
           </div>
@@ -167,7 +257,7 @@ export default function HomePage() {
                     Email support
                   </li>
                 </ul>
-                <Button className="w-full mt-6">Get Started</Button>
+                <Button onClick={() => handlePricingGetStartedClick("Starter")} className="w-full mt-6">Get Started</Button>
               </CardContent>
             </Card>
             <Card className="border-2 border-blue-600 relative">
@@ -198,7 +288,7 @@ export default function HomePage() {
                     Custom domain
                   </li>
                 </ul>
-                <Button className="w-full mt-6">Get Started</Button>
+                <Button onClick={() => handlePricingGetStartedClick("Pro")} className="w-full mt-6">Get Started</Button>
               </CardContent>
             </Card>
             <Card className="border-2">
@@ -228,7 +318,7 @@ export default function HomePage() {
                     Custom integrations
                   </li>
                 </ul>
-                <Button className="w-full mt-6">Contact Sales</Button>
+                <Button onClick={handleContactSalesClick} className="w-full mt-6">Contact Sales</Button>
               </CardContent>
             </Card>
           </div>
@@ -309,7 +399,7 @@ export default function HomePage() {
             Join thousands of creators who trust ProductHub to power their digital product business.
           </p>
           <Link href="/signup">
-            <Button size="lg" className="text-lg px-8 py-3">
+            <Button onClick={handleFinalCTAClick} size="lg" className="text-lg px-8 py-3">
               Start Your Free Trial
             </Button>
           </Link>

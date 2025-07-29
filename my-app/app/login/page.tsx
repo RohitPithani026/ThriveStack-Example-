@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { event } from '@/lib/gtag';
-import { thriveStackTrack } from '@/lib/thrivestack';
+import { thriveStackTrack, trackButtonClick } from '@/hooks/useAnalytics';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -45,12 +45,15 @@ export default function LoginPage() {
       thriveStackTrack([
         {
           event_name: "signed_in",
-          user_id: email, // or use your app's userId
+          user_id: email,
           timestamp: new Date().toISOString(),
           properties: {
             user_email: email,
             user_name: email.split("@")[0],
-            utm_source: "login_form", // or dynamic source
+            utm_source: "login_form",
+          },
+          context: {
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b",
           }
         }
       ]);
@@ -60,6 +63,25 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+
+  const handleButtonClick = () => {
+    console.log("CTA clicked");
+    event({
+      action: 'dashboard_visit',
+      category: 'User',
+      label: 'Initial Dashboard Load',
+    });
+    
+    // Track button click with ThriveStack
+    if (email) {
+      trackButtonClick(
+        email,
+        "sign_in_button",
+        "login_page",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -112,14 +134,12 @@ export default function LoginPage() {
                 />
               </div>
 
-              <Button onClick={() => {
-                console.log("CTA clicked");
-                event({
-                  action: 'dashboard_visit',
-                  category: 'User',
-                  label: 'Initial Dashboard Load',
-                });
-              }} type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                onClick={handleButtonClick} 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>

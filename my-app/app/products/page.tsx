@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus } from "lucide-react"
 import { event } from "@/lib/gtag"
-import { thriveStackTrack } from "@/lib/thrivestack"
+import { thriveStackTrack, trackPageView, trackButtonClick } from "@/hooks/useAnalytics"
+import { useEffect, useState } from "react"
 
 interface Product {
   id: string
@@ -17,7 +18,15 @@ interface Product {
   sales: number
 }
 
+interface User {
+  email: string
+  name: string
+  userId?: string 
+}
+
 export default function ProductsPage() {
+  const [user, setUser] = useState<User | null>(null)
+
   const products: Product[] = [
     {
       id: "1",
@@ -85,6 +94,96 @@ export default function ProductsPage() {
     },
   ]
 
+  // Get user data on mount
+  useEffect(() => {
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      const parsed = JSON.parse(userData)
+      setUser(parsed)
+    }
+  }, [])
+
+  // Track page view on mount
+  useEffect(() => {
+    if (user) {
+      trackPageView(
+        user.userId || user.email,
+        "products_page",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  }, [user]);
+
+  const handleProductView = (product: Product) => {
+    if (user) {
+      // GA event (already existing)
+      event({
+        action: 'first_action',
+        category: 'Activation',
+        label: 'Visited Product',
+      });
+
+      // ThriveStack product_viewed event
+      thriveStackTrack([
+        {
+          event_name: "product_viewed",
+          user_id: user.userId || user.email,
+          timestamp: new Date().toISOString(),
+          properties: {
+            product_name: product.name,
+            category: product.category,
+            product_id: product.id,
+            price: product.price,
+          },
+          context: {
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b",
+          },
+        },
+      ]);
+    }
+  };
+
+  const handleProductPurchase = (product: Product) => {
+    if (user) {
+      // GA event
+      event({
+        action: "purchase_course",
+        category: "Ecommerce",
+        label: "Paid Course Purchased",
+        value: product.price,
+      });
+
+      // ThriveStack tracking
+      thriveStackTrack([
+        {
+          event_name: "product_purchased",
+          user_id: user.userId || user.email,
+          timestamp: new Date().toISOString(),
+          properties: {
+            product_name: product.name,
+            category: product.category,
+            price: product.price,
+            product_id: product.id,
+          },
+          context: {
+            group_id: "ac8db7ba-5139-4911-ba6e-523fd9c4704b",
+          },
+        },
+      ]);
+    }
+  };
+
+  const handleAddProductClick = () => {
+    if (user) {
+      trackButtonClick(
+        user.userId || user.email,
+        "add_product_button",
+        "products_page",
+        "ac8db7ba-5139-4911-ba6e-523fd9c4704b"
+      );
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-8">
@@ -92,7 +191,7 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600">Manage your digital products</p>
         </div>
-        <Button>
+        <Button onClick={handleAddProductClick}>
           <Plus className="w-4 h-4 mr-2" />
           Add Product
         </Button>
@@ -116,69 +215,13 @@ export default function ProductsPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-blue-600">${product.price}</span>
                   <Button
-                    onClick={() => {
-                      const user = JSON.parse(localStorage.getItem("user") || "{}");
-                      const userId = user.email; // or `user.id` if available
-                      const groupId = "ac8db7ba-5139-4911-ba6e-523fd9c4704b"; // replace with actual group/account ID
-
-                      // GA event (already existing)
-                      event({
-                        action: 'first_action',
-                        category: 'Activation',
-                        label: 'Visited Product',
-                      });
-
-                      // ✅ ThriveStack product_viewed event
-                      thriveStackTrack([
-                        {
-                          event_name: "product_viewed",
-                          user_id: userId,
-                          timestamp: new Date().toISOString(),
-                          properties: {
-                            product_name: product.name,
-                            category: product.category,
-                          },
-                          context: {
-                            group_id: groupId,
-                          },
-                        },
-                      ]);
-                    }}
+                    onClick={() => handleProductView(product)}
                     size="sm"
                   >
                     Details
                   </Button>
                   <Button
-                    onClick={() => {
-                      const user = JSON.parse(localStorage.getItem("user") || "{}");
-                      const userId = user.email; // or user.id if you store it
-                      const groupId = "ac8db7ba-5139-4911-ba6e-523fd9c4704b"; // replace with actual value
-
-                      // GA event
-                      event({
-                        action: "purchase_course",
-                        category: "Ecommerce",
-                        label: "Paid Course Purchased",
-                        value: product.price, // match the actual price
-                      });
-
-                      // ThriveStack tracking
-                      thriveStackTrack([
-                        {
-                          event_name: "product_purchased",
-                          user_id: userId,
-                          timestamp: new Date().toISOString(),
-                          properties: {
-                            product_name: product.name,
-                            category: product.category,
-                            price: product.price,
-                          },
-                          context: {
-                            group_id: groupId,
-                          },
-                        },
-                      ]);
-                    }}
+                    onClick={() => handleProductPurchase(product)}
                     size="sm"
                   >
                     Buy Now

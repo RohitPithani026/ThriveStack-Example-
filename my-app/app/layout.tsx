@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { metadata } from './head';  // Import metadata from head.tsx
 import mixpanel from "mixpanel-browser";
 import amplitude from 'amplitude-js';
-import { ThriveStackProvider } from '@/components/ThriveStackProvider';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -121,12 +120,7 @@ export default function RootLayout({
       <body
         className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
       >
-        <ThriveStackProvider
-          apiKey="/0h1H3frdqN8u1C99q03MMu+VO8YbQeXbNa1VQPXf3A="
-          source="marketing,product"
-        >
-          {children}
-        </ThriveStackProvider>
+        {children}
       </body>
     </html>
   );
